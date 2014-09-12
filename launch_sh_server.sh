@@ -11,7 +11,7 @@
 
 
 
-. ~/sw/sfm/sfm.lib
+. ~/sw/sfm/server_sfm/server_sfm.lib
 #. ~/dsw/video_server/ds_common.lib
 
 RENDER_SERVER=$HOME/sfm/RENDER_SERVER

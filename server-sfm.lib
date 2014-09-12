@@ -22,9 +22,10 @@ SERVER_IP="NULL"
 START_SERVER_IP_RANGE=20
 SERVER_LIST_DIR=~/sfm/servers
 SSH_KEY=~/.key/dloud.pem
-SSH_KEY_C=~/dsw/dloud.pem
+SSH_KEY_C=~/sfm/dloud.pem
 MATCH_LIST_DIR=$IMG_LOG_DIR/matches/
 SERVER_DIR=~/
+SFM_USERNAME="dmonaghan"
 #VSFM_AMI_ID=ami-1b785972
 SERVER_DIR=~/sfm
    #???
@@ -208,26 +209,26 @@ echo "looks like all Servers are Online!"
 echo "LS'n servers:"
 for i in `cat $SERVER_LIST_DIR/serverlist.txt` ;do 
 # this line removes the ip from knownhosts to prevent a Spoof Login
-    ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $i
+    ssh-keygen -f "~/.ssh/known_hosts" -R $i
 	ping $i -c 5
-	scp -i $SSH_KEY ~/sfm/launch_sh_server.sh dmonaghan@$i:~/dsw/aws/
-	scp -i $SSH_KEY ~/dsw/aws/sh_server.sh dmonaghan@$i:~/dsw/aws/
-	scp -i $SSH_KEY ~/dsw/aws/ec2-sfm.lib dmonaghan@$i:~/dsw/aws/
+	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
+	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
+	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $SFM_USERNAME@$i:~/sfm/server_sfm/
 # copy yrself yo!
 
-	ssh -i $SSH_KEY ubuntu@$i "killall screen"	
-	ssh -i $SSH_KEY ubuntu@$i "mkdir -p ~/JOBS/SET"
-	ssh -X -i $SSH_KEY ubuntu@$i "~/dsw/aws/launch_sh_server.sh"
-	ssh -i $SSH_KEY ubuntu@$i "mkdir -p ~/JOBS/SET"
-	ssh -i $SSH_KEY ubuntu@$i "mkdir -p ~/JOBS/DONE"
-	ssh -i $SSH_KEY ubuntu@$i "mkdir /media/ephemeral/siftlists"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "killall screen"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
+	ssh -X -i $SSH_KEY $SFM_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/DONE"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir /media/ephemeral/siftlists"
 
 
 done
 
 }
 
-#scp -i ~/dloud.pem -r $1 ubuntu@10.0.0.164:~/
+#scp -i ~/dloud.pem -r $1 $SFM_USERNAME@10.0.0.164:~/
 #40r
 
 
@@ -403,7 +404,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		echo cd /media/ephemeral > $JOBS_SET/"$i"_sift_JOB.sh
 		echo VisualSFM siftgpu "$i"_siftlist.txt >> $JOBS_SET/"$i"_sift_JOB.sh
 #		echo scpHome *.sift $WORKING_DIR 	 >> $JOBS_SET/"$i"_sift_JOB.sh
-		echo scp -i $SSH_KEY_C -r *.sift ubuntu@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
+		echo scp -i $SSH_KEY_C -r *.sift $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
 
 	
 		chmod +x $JOBS_SET/"$i"_sift_JOB.sh
@@ -411,7 +412,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $CURRENT_SERVER:~/RENDER_SERVER/JOBS_SETUP/
 
 		IN_FILE="$i"_sift_JOB.sh 
-		ssh -i $SSH_KEY ubuntu@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+		ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
 #		scpToCueIp "$i"_JOB.sh $CURRENT_SERVER
 		
@@ -503,11 +504,11 @@ sdiff .invert_no_ext .main_no_ext | grep "<" | sed 's/<//g' > .outlist_prext.txt
 for i in \`cat .outlist_prext.txt\` 
 	do 
 		#cp /media/ephemeral/\$i.sift . ;done 
-		scp -i $SSH_KEY_C ubuntu@$MASTER_SERVER:$WORKING_DIR/\$i.sift . ;
+		scp -i $SSH_KEY_C $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR/\$i.sift . ;
 		done
 rm .outlist_prext.txt
 #touch $WORKING_DIR/got_sifts_$i
-ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" ubuntu@10.0.164 "touch $WORKING_DIR/got_sifts_$i"
+ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $SFM_USERNAME@10.0.164 "touch $WORKING_DIR/got_sifts_$i"
 EOF
 
 chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
@@ -516,7 +517,7 @@ chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
 scp -i $SSH_KEY $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $CURRENT_SERVER:~/RENDER_SERVER/JOBS_SETUP/
 
 IN_FILE="$i"_SIFT_MOVE_JOB.sh
-ssh -i $SSH_KEY ubuntu@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 mv $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $JOBS_DONE/"$i"_SIFT_MOVE_JOB.sh
 
 done
@@ -620,7 +621,7 @@ for (( c=1; c<=$NUMBER_OF_SERVERS; c++ ))
         	sed -n "$STARTLINE","$ENDLINE"p $MATCH_LIST_DIR/.matchtmp.txt  > $WORKING_DIR/matchlist_$c.txt 
 	fi
 CURRENT_SERVER=`sed -n "$c"p $SERVER_LIST_DIR/serverlist.txt`
-scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt ubuntu@$CURRENT_SERVER:/media/ephemeral/
+scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SFM_USERNAME@$CURRENT_SERVER:/media/ephemeral/
 
 done                     
 }
@@ -646,7 +647,7 @@ cd /media/ephemeral/
 
 VisualSFM sfm+pairs+skipsfm . nomatch.nvm matchlist_$i.txt
 VisualSFM sfm+skipsfm+exportp . matches_out_$i.txt
-scp -i $SSH_KEY_C matches_out_$i.txt ubuntu@$MASTER_SERVER:$WORKING_DIR/
+scp -i $SSH_KEY_C matches_out_$i.txt $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR/
 #cp matches_out_$i.txt $WORKING_DIR/
 EOF
 
@@ -655,7 +656,7 @@ chmod +x $JOBS_SET/"$i"_MATCH_JOB.sh
 scp -i $SSH_KEY $JOBS_SET/"$i"_MATCH_JOB.sh $CURRENT_SERVER:~/RENDER_SERVER/JOBS_SETUP/
 IN_FILE="$i"_MATCH_JOB.sh
 
-ssh -i $SSH_KEY ubuntu@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
 
 done
@@ -796,23 +797,23 @@ scpTo () {
 	SCP_FILE=$1
 	DEST_IP=$2
 	SCP_REMOTE_DIR=$3
-	scp -i $SSH_KEY -r $SCP_FILE ubuntu@$DEST_IP:$SCP_DIR
+	scp -i $SSH_KEY -r $SCP_FILE $SFM_USERNAME@$DEST_IP:$SCP_DIR
 }
 
 scpToCueIp () {
 	echo "in function scpToCueIp"
 	IN_FILE=$1
 	DEST_IP=$2
-	ssh -i $SSH_KEY ubuntu@$DEST_IP "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+	ssh -i $SSH_KEY $SFM_USERNAME@$DEST_IP "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
-	# ssh -i ~/dsw/aws/dloud.pem ubuntu@107.23.25.221 "RFILE=$FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+	# ssh -i ~/dsw/aws/dloud.pem $SFM_USERNAME@107.23.25.221 "RFILE=$FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 }	
 
 scpHome () {
 	echo "in function scpHome!"
 	IN_FILE=$1
 	DEST_IP=$HOME_IP
-	scp -i $SSH_KEY -r $SCP_FILE ubuntu@$DEST_IP:$WORKING_DIR
+	scp -i $SSH_KEY -r $SCP_FILE $SFM_USERNAME@$DEST_IP:$WORKING_DIR
 	:
 }
 
