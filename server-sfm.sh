@@ -3,7 +3,7 @@
 
 #known functions and execution order to be added.
 
-. ~/sfm/server-sfm.lib
+. ~/sfm/server_sfm/server-sfm.lib
 
 ### WORKING FUNCTIONS
 
@@ -24,9 +24,10 @@ initDirs
 #20
 getImgList
 #30 - Assigns the IP addresses...
-##assignIPRange
+assignIPRange
 #39
-serverIDs
+### not executing serverIDs.... not relevant...
+#serverIDs
 #echo "end here?"
 #read ab
 #read av
@@ -34,8 +35,8 @@ serverIDs
 #40
 realServerCreation
 #fakeServerCreation
-#echo "end here?"
-#read ab
+echo "end here?"
+read ab
 #read av
 
 initRemoteServers

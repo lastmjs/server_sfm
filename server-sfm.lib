@@ -15,12 +15,13 @@ echo "Booting SFM"
 initVars () {
 TESTLOCAL=0 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
 MASTER_SERVER="nz7-10516.local"
+SEVER_POSTFIX=".nz.local"
 IP_LOG_DIR=~/sfm/iplog/
 IMG_LOG_DIR=~/sfm/imglogdir/
 WORKING_DIR=$PWD
 SERVER_IP="NULL"
 START_SERVER_IP_RANGE=20
-SERVER_LIST_DIR=~/sfm/servers
+SERVER_LIST_DIR=~/sfm/servers/
 SSH_KEY=~/.key/dloud.pem
 SSH_KEY_C=~/sfm/dloud.pem
 MATCH_LIST_DIR=$IMG_LOG_DIR/matches/
@@ -59,7 +60,7 @@ read nothing_again
 }
 
 initDirs () {
-mkdir -p ~/sfm/iplog/ ~/sfm/imglogdir/matches ~/sfm/servers ~/sfm/online_servers ~/sfm/JOBS/SET ~/sfm/JOBS/DONE $WORKING_DIR/siftlists
+mkdir -p ~/sfm/iplog ~/sfm/imglogdir/matches ~/sfm/servers ~/sfm/online_servers ~/sfm/JOBS/SET ~/sfm/JOBS/DONE $WORKING_DIR/siftlists
 }
 
 ### BEGIN BIG CLEAN UP
@@ -113,6 +114,8 @@ echo $IMAGES
 
 rm -fr $SERVER_LIST_DIR/serverlist.txt
 
+echo "Sever List Dir is: $SERVER_LIST_DIR"
+
 #replacing ec2 server list with manual server list
 echo "nz7-10432.local" > $SERVER_LIST_DIR/serverlist.txt
 echo "nz7-10500.local" >>$SERVER_LIST_DIR/serverlist.txt
@@ -137,7 +140,8 @@ echo "nz7-10516.local" >>$SERVER_LIST_DIR/serverlist.txt
 
 									serverIDs () {
 # not yet imp
-
+#
+# GET RID OF....
 
 echo "Selecting cluster 1-4"
 read SERVER_SELECTOR
@@ -179,7 +183,7 @@ esac
 #done
 
 SERV_PLAN=`cat $SERVER_LIST_DIR/serverlist.txt | wc -l`
-SERV_ONLINE=`ls -1 ~/.aws/online_servers | wc -l`
+SERV_ONLINE=`ls -1 ~/sfm/online_servers | wc -l`
 echo SERV_PLAN= $SERV_PLAN SERV_ONLINE= $SERV_ONLINE
 
 while [ "$SERV_ONLINE" -lt "$SERV_PLAN" ]
