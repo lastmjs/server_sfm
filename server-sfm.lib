@@ -1,21 +1,17 @@
 #aws-sfm.lib
 
-echo "		             ▄▄▖             ▄▄           ▗▄▖    █  ▗▖   "
-echo "		            ▐▀▀█▖           ▐▛▀           ▝▜▌    ▀  ▐▌   "
-echo "		   ▟█▙  ▟██▖   ▐▌     ▗▟██▖▐███ ▐█▙█▖      ▐▌   ██  ▐▙█▙ "
-echo "		  ▐▙▄▟▌▐▛  ▘  ▗▛      ▐▙▄▖▘ ▐▌  ▐▌█▐▌      ▐▌    █  ▐▛ ▜▌"
-echo "		  ▐▛▀▀▘▐▌    ▗▛        ▀▀█▖ ▐▌  ▐▌█▐▌      ▐▌    █  ▐▌ ▐▌"
-echo "		  ▝█▄▄▌▝█▄▄▌▗█▄▄▖     ▐▄▄▟▌ ▐▌  ▐▌█▐▌  █   ▐▙▄ ▗▄█▄▖▐█▄█▘"
-echo "		   ▝▀▀  ▝▀▀ ▝▀▀▀▘      ▀▀▀  ▝▘  ▝▘▀▝▘  ▀    ▀▀ ▝▀▀▀▘▝▘▀▘ "
 
-
-set -u
+echo "	                          _   "
+echo "	 _  _  __    _  __    _ _|___ "
+echo " 	_> (/_ | \_/(/_ |    _>  | |||"
+echo " "
+#set -u
 echo "Booting SFM"
 
 initVars () {
 TESTLOCAL=0 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
 MASTER_SERVER="nz7-10516.local"
-HOST_SERVER_POSTFIX".local"
+
 SERVER_POSTFIX=".nz.local"
 IP_LOG_DIR=~/sfm/iplog/
 IMG_LOG_DIR=~/sfm/imglogdir/
@@ -23,8 +19,8 @@ WORKING_DIR=$PWD
 SERVER_IP="NULL"
 START_SERVER_IP_RANGE=20
 SERVER_LIST_DIR=~/sfm/servers/
-SSH_KEY=~/.key/dloud.pem
-SSH_KEY_C=~/sfm/dloud.pem
+SSH_KEY=~/.ssh/sfm.pem
+SSH_KEY_C=~/.ssh/sfm.pem
 MATCH_LIST_DIR=$IMG_LOG_DIR/matches/
 SERVER_DIR=~/
 SFM_USERNAME="dmonaghan"
@@ -61,8 +57,13 @@ read nothing_again
 }
 
 initDirs () {
+mkdir -p ~/sfm/iplog ~/sfm/imglogdir/matches ~/sfm/servers ~/sfm/online_servers ~/sfm/JOBS/SET ~/sfm/JOBS/DONE $WORKING_DIR/siftlists ~/sfm/online_servers
+}
+
+initClientDirs () {
 mkdir -p ~/sfm/iplog ~/sfm/imglogdir/matches ~/sfm/servers ~/sfm/online_servers ~/sfm/JOBS/SET ~/sfm/JOBS/DONE $WORKING_DIR/siftlists
 }
+
 
 ### BEGIN BIG CLEAN UP
 
@@ -839,4 +840,11 @@ cat $IPLOGDIR/$CURRENT_INSTANCE_LOG | grep INSTANCE | awk '{print $2}' > $IPLOGD
 #~ IMAGE_BUNDLE=$WORKING_DIR.tar
 #~ echo "IMAGE_BUNDLE = $IMAGE_BUNDLE"
 #~ }
+# echo "		             ▄▄▖             ▄▄           ▗▄▖    █  ▗▖   "
+# echo "		            ▐▀▀█▖           ▐▛▀           ▝▜▌    ▀  ▐▌   "
+# echo "		   ▟█▙  ▟██▖   ▐▌     ▗▟██▖▐███ ▐█▙█▖      ▐▌   ██  ▐▙█▙ "
+# echo "		  ▐▙▄▟▌▐▛  ▘  ▗▛      ▐▙▄▖▘ ▐▌  ▐▌█▐▌      ▐▌    █  ▐▛ ▜▌"
+# echo "		  ▐▛▀▀▘▐▌    ▗▛        ▀▀█▖ ▐▌  ▐▌█▐▌      ▐▌    █  ▐▌ ▐▌"
+# echo "		  ▝█▄▄▌▝█▄▄▌▗█▄▄▖     ▐▄▄▟▌ ▐▌  ▐▌█▐▌  █   ▐▙▄ ▗▄█▄▖▐█▄█▘"
+# echo "		   ▝▀▀  ▝▀▀ ▝▀▀▀▘      ▀▀▀  ▝▘  ▝▘▀▝▘  ▀    ▀▀ ▝▀▀▀▘▝▘▀▘ "
 
