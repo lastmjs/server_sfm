@@ -11,13 +11,15 @@
 
 
 
-. ~/sfm/server_sfm/server_sfm.lib
+. ~/sfm/server_sfm/server-sfm.lib
 #. ~/dsw/video_server/ds_common.lib
-
-LOCALHOSTNAME=`scutil --get LocalHostName`
-FULLHOSTNAME=$LOCALHOSTNAME$SERVER_POSTFIX
+initVars
+initClientDirs
+echo "SERVER_POSTFIX="$SERVER_POSTFIX
+LOCALHOSTNAME=`scutil --get LocalHostName`; echo $LOCALHOSTNAME
+FULLHOSTNAME="$LOCALHOSTNAME$SERVER_POSTFIX"
 echo $FULLHOSTNAME > ~/sfm/serverID/$FULLHOSTNAME
-scp -i ~/sfm/dloud.pem -r ~/sfm/serverID/$FULLHOSTNAME $SFM_USERNAME@$MASTER_SERVER:~/sfm/online_servers/
+scp -i $SSH_KEY -r ~/sfm/serverID/$FULLHOSTNAME $SFM_USERNAME@$MASTER_SERVER:~/sfm/online_servers/
 
 
 
