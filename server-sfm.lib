@@ -15,7 +15,8 @@ echo "Booting SFM"
 initVars () {
 TESTLOCAL=0 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
 MASTER_SERVER="nz7-10516.local"
-SEVER_POSTFIX=".nz.local"
+HOST_SERVER_POSTFIX".local"
+SERVER_POSTFIX=".nz.local"
 IP_LOG_DIR=~/sfm/iplog/
 IMG_LOG_DIR=~/sfm/imglogdir/
 WORKING_DIR=$PWD

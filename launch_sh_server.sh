@@ -1,4 +1,4 @@
-#!/bin/bash
+90#!/bin/bash
 # ex ffmxf_server_local.sh
 # (no input args)
 # Created by devteam on 20/05/13.
@@ -9,10 +9,11 @@
 #Start Up... Move incomplete jobs from JOBS CUED TO JOBS PENDING...
 
 
-
+#   -o BatchMode=yes -o StrictHostKeyChecking=no
 
 . ~/sfm/server_sfm/server_sfm.lib
 #. ~/dsw/video_server/ds_common.lib
+mkdir -p ~/sfm/serverID/
 
 LOCALHOSTNAME=`scutil --get LocalHostName`
 FULLHOSTNAME=$LOCALHOSTNAME$SERVER_POSTFIX
