@@ -30,6 +30,7 @@ SERVER_DIR=~/sfm
 #echo $UNINITIATED
 JOBS_SET=~/sfm/JOBS/SET
 JOBS_DONE=~/sfm/JOBS/DONE
+HOST_WORKDIR=~/Pictures/sfmWorkDir
 }
 
 
@@ -215,19 +216,19 @@ echo "looks like all Servers are Online!"
 echo "LS'n servers:"
 for i in `cat $SERVER_LIST_DIR/serverlist.txt` ;do 
 # this line removes the ip from knownhosts to prevent a Spoof Login
-    ssh-keygen -f "~/.ssh/known_hosts" -R $i
-	ping $i -c 5
+    ssh-keygen -F "~/.ssh/known_hosts" -R $i
+	ping -c 5 $i
 	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
 	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
 	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $SFM_USERNAME@$i:~/sfm/server_sfm/
 # copy yrself yo!
 
-	ssh -i $SSH_KEY $SFM_USERNAME@$i "killall screen"
+#	ssh -i $SSH_KEY $SFM_USERNAME@$i "killall screen"
 	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
-	ssh -X -i $SSH_KEY $SFM_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
+#	ssh -X -i $SSH_KEY $SFM_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
 	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
 	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/DONE"
-	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir /media/ephemeral/siftlists"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p $HOST_WORKDIR"
 
 
 done
