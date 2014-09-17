@@ -501,9 +501,9 @@ echo MY PWD IS... $PWD
 MAIN=".sift"
 INVERT=".JPG"
 ls -1 *.sift > .main_list
-ls -1 *JPG > .invert_list
+ls -1 *[jJ][pP][gG] > .invert_list
 echo "sed1"
-sed "s/.JPG//g" .invert_list > .invert_no_ext
+sed "s/.[jJ][pP][gG]//g" .invert_list > .invert_no_ext
 echo "sed2"
 sed "s/.sift//g" .main_list > .main_no_ext
 echo "sed3"
@@ -516,7 +516,7 @@ for i in \`cat .outlist_prext.txt\`
 		done
 rm .outlist_prext.txt
 #touch $WORKING_DIR/got_sifts_$i
-ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $SFM_USERNAME@10.0.164 "touch $WORKING_DIR/got_sifts_$i"
+ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $SFM_USERNAME@$MASTER_SERVER "touch $WORKING_DIR/got_sifts_$i"
 EOF
 
 chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
@@ -524,8 +524,8 @@ chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
 
 scp -i $SSH_KEY $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 
-IN_FILE="$i"_JOBS_SET.sh
-ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+IN_FILE="$i"_SIFT_MOVE_JOB.sh
+ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 mv $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $JOBS_DONE/"$i"_SIFT_MOVE_JOB.sh
 
 done
