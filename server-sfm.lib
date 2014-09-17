@@ -516,7 +516,7 @@ for i in \`cat .outlist_prext.txt\`
 		done
 rm .outlist_prext.txt
 #touch $WORKING_DIR/got_sifts_$i
-ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $SFM_USERNAME@$MASTER_SERVER "touch $WORKING_DIR/got_sifts_$i"
+ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $SFM_USERNAME@$MASTER_SERVER	 "touch $WORKING_DIR/got_sifts_$i"
 EOF
 
 chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
@@ -651,7 +651,7 @@ for (( i=1 ; i <= $j ; i++ )) ; do
 CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
 
 cat <<EOF > $JOBS_SET/"$i"_MATCH_JOB.sh
-cd /media/ephemeral/
+cd $HOST_WORKDIR
 
 VisualSFM sfm+pairs+skipsfm . nomatch.nvm matchlist_$i.txt
 VisualSFM sfm+skipsfm+exportp . matches_out_$i.txt
