@@ -85,7 +85,7 @@ waitForMatchesToExport
 #160
 combineMatch
 #170
-copyMatchestoRealServers
+copyMatchesToRealServers
 #copyMatchesToFakeServers
 #180
 

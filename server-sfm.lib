@@ -719,7 +719,7 @@ done
 #VisualSFM sfm+exportp [input] matches.txt
 #VisualSFM sfm+skip+import+skipsfm [full_image_list] [output.nvm] matches1.txt
 #VisualSFM sfm+skip+import+skipsfm [full_image_list] [output.nvm] matchesn.txt
-:
+
 }
 								 #~ ███    ██████  ▓██▓ 
 								   #~ █        ▓▓ ▒█  █▒
@@ -731,7 +731,7 @@ done
 								   #~ █     ▒█    ▒█  █▒
 								 #~ █████   █▒     ▓██▓ 
 
-copyMatchesToRealServers () {
+function copyMatchesToRealServers () {
 
 for i in `cat $SERVER_LIST_DIR/serverlist.txt`
 do 
