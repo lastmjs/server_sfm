@@ -365,7 +365,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1}'`
 			CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt` 
 			echo server $CURRENT_SERVER number $i
 
-			scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$SERVER_DIR
+			scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$HOST_WORKDIR
 		done
 echo "leaving cLTRS"
 }
@@ -409,7 +409,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		##### WHERE YO AT YO
 		#echo cd "$HOME"/.aws/servers/fake_servers/"$CURRENT_SERVER"/ 	 > $JOBS_SET/"$i"_JOB.sh
 		#echo "echo your pwd is: \$PWD" 									>> $JOBS_SET/"$i"_JOB.sh
-		echo cd /media/ephemeral > $JOBS_SET/"$i"_sift_JOB.sh
+		echo cd $HOST_WORKDIR > $JOBS_SET/"$i"_sift_JOB.sh
 		echo VisualSFM siftgpu "$i"_siftlist.txt >> $JOBS_SET/"$i"_sift_JOB.sh
 #		echo scpHome *.sift $WORKING_DIR 	 >> $JOBS_SET/"$i"_sift_JOB.sh
 		echo scp -i $SSH_KEY_C -r *.sift $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
@@ -417,10 +417,10 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 	
 		chmod +x $JOBS_SET/"$i"_sift_JOB.sh
 		
-		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $CURRENT_SERVER:~/RENDER_SERVER/JOBS_SETUP/
+		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 
 		IN_FILE="$i"_sift_JOB.sh 
-		ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+		ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
 #		scpToCueIp "$i"_JOB.sh $CURRENT_SERVER
 		
@@ -462,7 +462,7 @@ done
 								waitForSiftsToFinish () {
 
 DIR_SIFTS=`ls -1 $WORKING_DIR/*.sift 2>/dev/null | wc -l`
-DIR_PEGS=`ls -1 $WORKING_DIR/*.JPG | wc -l`
+DIR_PEGS=`ls -1 $WORKING_DIR/*.[jJ][pP][gG] | wc -l`
 echo DIR_SIFTS= $DIR_SIFTS DIR_PEGS= $DIR_PEGS
 #
 
@@ -495,7 +495,7 @@ for (( i=1 ; i <= $j ; i++)) ; do
 CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
 #sould become function (getLoopCurrentServerID#
 	cat <<EOF > $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
-cd /media/ephemeral/
+cd $HOST_WORKDIR
 echo MY PWD IS... $PWD
 #rm getRemainingSifts.txt   
 MAIN=".sift"
@@ -522,10 +522,10 @@ EOF
 chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
 #mv $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_SIFT_MOVE_JOB.sh $HOME/RENDER_SERVER/JOBS_PENDING/
 
-scp -i $SSH_KEY $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $CURRENT_SERVER:~/RENDER_SERVER/JOBS_SETUP/
+scp -i $SSH_KEY $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 
-IN_FILE="$i"_SIFT_MOVE_JOB.sh
-ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+IN_FILE="$i"_JOBS_SET.sh
+ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 mv $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $JOBS_DONE/"$i"_SIFT_MOVE_JOB.sh
 
 done
@@ -629,7 +629,7 @@ for (( c=1; c<=$NUMBER_OF_SERVERS; c++ ))
         	sed -n "$STARTLINE","$ENDLINE"p $MATCH_LIST_DIR/.matchtmp.txt  > $WORKING_DIR/matchlist_$c.txt 
 	fi
 CURRENT_SERVER=`sed -n "$c"p $SERVER_LIST_DIR/serverlist.txt`
-scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SFM_USERNAME@$CURRENT_SERVER:/media/ephemeral/
+scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SFM_USERNAME@$CURRENT_SERVER:$HOST_WORKDIR
 
 done                     
 }
@@ -661,10 +661,10 @@ EOF
 
 chmod +x $JOBS_SET/"$i"_MATCH_JOB.sh
 #mv $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_MATCH_JOB.sh $HOME/RENDER_SERVER/JOBS_PENDING/
-scp -i $SSH_KEY $JOBS_SET/"$i"_MATCH_JOB.sh $CURRENT_SERVER:~/RENDER_SERVER/JOBS_SETUP/
+scp -i $SSH_KEY $JOBS_SET/"$i"_MATCH_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 IN_FILE="$i"_MATCH_JOB.sh
 
-ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
 
 done
@@ -735,7 +735,7 @@ copyMatchesToRealServers () {
 
 for i in `cat $SERVER_LIST_DIR/serverlist.txt`
 do 
-scp -i $SSH_KEY *.mat $i:/media/ephemeral
+scp -i $SSH_KEY *.mat $i:$HOST_WORKDIR
 #     for j in `ls -1 $WORKING_DIR/*.mat`
 #	do
 #	scp -i dloud.pem $j $i:/media/ephemeral
