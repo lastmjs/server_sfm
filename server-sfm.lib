@@ -123,6 +123,7 @@ echo "Sever List Dir is: $SERVER_LIST_DIR"
 echo "nz7-10432.local" > $SERVER_LIST_DIR/serverlist.txt
 echo "nz7-10500.local" >>$SERVER_LIST_DIR/serverlist.txt
 echo "nz7-10516.local" >>$SERVER_LIST_DIR/serverlist.txt
+NUMBER_OF_SERVERS=3  # should be wc -l $SERVER_LIST_DIR/serverlist.txt | awk {'print $1'}
 
 #for (( i=1; i<= $NUMBER_OF_SERVERS ; i++ ))
 #	do
