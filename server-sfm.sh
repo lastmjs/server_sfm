@@ -36,7 +36,7 @@ assignIPRange
 realServerCreation
 #fakeServerCreation
 echo "end here?"
-read ab
+#read ab
 #read av
 
 initRemoteServers
@@ -59,18 +59,18 @@ startRealSifts
 waitForSiftsToFinish
 
 echo END HERE?
-read noout
+#read noout
 
 #100
 getInverseSifts
 
 echo END AT getInverseSifts
-read nnout
+#read nnout
 #110
 waitForSiftsToCopy
 
 echo END at waitForSiftsToCopy
-read nouut
+#read nouut
 
 # START MATCH ON SERVERS
 
