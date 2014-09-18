@@ -605,15 +605,15 @@ for (( c = 1; c <= $IMAGES; c++ ))
 		for (( $MATCHLOOP ; $MATCHLOOP<=$IMAGES; MATCHLOOP++ ))
 			do 
 			((TOTALCOUNT++))
-			SECONDPAIR=`sed -n "$MATCHLOOP"p $IMG_LOG_DIR/img_list.txt`
+			#SECONDPAIR=`sed -n "$MATCHLOOP"p $IMG_LOG_DIR/img_list.txt`
 			SECONDPAIR=${FILENAMEARRAY[$MATCHLOOP]}
 			MAINPAIR=${FILENAMEARRAY[$c]}
 			#MAINPAIR=`sed -n "$c"p $IMG_LOG_DIR/img_list.txt`
 			#	if [ "$TESTLOCAL" -eq 0 ]
 			#then 
-			#	echo $MAINPAIR $SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
+				echo $MAINPAIR $SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
 			#else
-			echo $WORKING_DIR/$MAINPAIR $WORKING_DIR/$SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
+			#echo $WORKING_DIR/$MAINPAIR $WORKING_DIR/$SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
 			#	fi		
 		done
 done
