@@ -218,7 +218,7 @@ echo "LS'n servers:"
 for i in `cat $SERVER_LIST_DIR/serverlist.txt` ;do 
 # this line removes the ip from knownhosts to prevent a Spoof Login
     ssh-keygen -F "~/.ssh/known_hosts" -R $i
-	ping -c 5 $i
+#	ping -c 1 $i
 #	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
 #	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
 #	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $SFM_USERNAME@$i:~/sfm/server_sfm/
@@ -273,13 +273,35 @@ ls $SERVER_LIST_DIR/fake_servers
 
 echo in CopyImagesToRealServers
 
+echo "Tarrring"
+tar cf imageArchive.tar --directory=$WORKING_DIR/ *.[jJ][pP][gG]
+
 for i in `cat $SERVER_LIST_DIR/serverlist.txt`
 do 
-    for j in `cat $IMG_LOG_DIR/img_list.txt` ;do	
-		scp -i $SSH_KEY $j $i:$HOST_WORKDIR
-	done
+    #for j in `cat $IMG_LOG_DIR/img_list.txt` ;do	
+    ssh-keygen -F "~/.ssh/known_hosts" -R $i 1>&2
+		scp -i $SSH_KEY imageArchive.tar $i:$HOST_WORKDIR &
+		#scp -i $SSH_KEY $j $i:$HOST_WORKDIR
+	#done
+done
+wait
+
+count=1
+for i in `cat $SERVER_LIST_DIR/serverlist.txt`
+do
+		
+			CURRENT_SERVER=`sed -n "$count"p $SERVER_LIST_DIR/serverlist.txt` 
+			echo server $CURRENT_SERVER number $i
+
+			#scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$HOST_WORKDIR
+
+			ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "cd $HOST_WORKDIR ; tar xf $HOST_WORKDIR/imageArchive.tar &"
+			((count++))
 done
 }
+
+
+
 
 #50-r
 copyImagesToFakeServers () {
@@ -569,6 +591,11 @@ echo "All Sifts at home exist"
 
 #iterate through each primary image
 TOTALCOUNT=0
+
+OLD_IFS=$IFS
+IFS=$'\r\n' GLOBIGNORE='*' :;
+FILENAMEARRAY=($(cat $IMG_LOG_DIR/img_list.txt))
+
 for (( c = 1; c <= $IMAGES; c++ ))
 	do
 	MATCHBEGIN=$(( c + 1 ))
@@ -579,16 +606,18 @@ for (( c = 1; c <= $IMAGES; c++ ))
 			do 
 			((TOTALCOUNT++))
 			SECONDPAIR=`sed -n "$MATCHLOOP"p $IMG_LOG_DIR/img_list.txt`
-			MAINPAIR=`sed -n "$c"p $IMG_LOG_DIR/img_list.txt`
-				if [ "$TESTLOCAL" -eq 0 ]
-			then 
-				echo $MAINPAIR $SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
-			else
+			SECONDPAIR=${FILENAMEARRAY[$MATCHLOOP]}
+			MAINPAIR=${FILENAMEARRAY[$c]}
+			#MAINPAIR=`sed -n "$c"p $IMG_LOG_DIR/img_list.txt`
+			#	if [ "$TESTLOCAL" -eq 0 ]
+			#then 
+			#	echo $MAINPAIR $SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
+			#else
 			echo $WORKING_DIR/$MAINPAIR $WORKING_DIR/$SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
-				fi		
+			#	fi		
 		done
 done
-
+IFS=$OLD_IFS
 
 echo TOTAL COUNT = $TOTALCOUNT
 echo 
