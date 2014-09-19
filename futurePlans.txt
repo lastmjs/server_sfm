@@ -1,0 +1,17 @@
+# notes...
+
+# need to....
+
+
+# add tar of sifts back and forth... although it doesn't seem like a big thing, it would speed up the start up.
+
+
+# load balancing on the matches,
+
+
+# do we break up the matches into say 100 groups, then send out as jobs.
+
+
+# write the pmvs engine first, this could be the prototype for the match groups + the tar and untar process.
+
+
