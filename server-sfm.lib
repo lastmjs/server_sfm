@@ -123,6 +123,7 @@ echo "Sever List Dir is: $SERVER_LIST_DIR"
 echo "nz7-10432.local" > $SERVER_LIST_DIR/serverlist.txt
 echo "nz7-10500.local" >>$SERVER_LIST_DIR/serverlist.txt
 echo "nz7-10516.local" >>$SERVER_LIST_DIR/serverlist.txt
+CPU_ARRAY=(16 24 24)
 NUMBER_OF_SERVERS=3  # should be wc -l $SERVER_LIST_DIR/serverlist.txt | awk {'print $1'}
 
 #for (( i=1; i<= $NUMBER_OF_SERVERS ; i++ ))
@@ -813,6 +814,31 @@ waitForMatchesToExport
 	fi
 done
 }
+
+
+reconstructSFM () {
+NVM_NAME=${PWD##*/}.nvm
+VisualSFM sfm+nomatch+cmvs . $NVM_NAME
+echo "done sparce reconstruction"
+}
+
+beginCMVSdistribution () {
+CMVSDIR=$NVM_NAME.cmvs
+
+OLD_IFS=$IFS
+INS=$'\r\n' GLOBIGNORE='*' :;
+MODEL_NAME_ARRAY=($(ls -1 | grep [0-9]))
+
+for i in "${MODEL_NAME_ARRAY[@]}"
+do
+   :
+   echo "${MODEL_NAME_ARRAY[$i]}"
+   # do whatever on $i
+done
+
+IFS=$OLD_IFS
+}
+
 
 # COMMON FUNCTIONS
 
