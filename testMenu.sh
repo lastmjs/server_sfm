@@ -5,7 +5,7 @@ trap "rm -f $tempfile" 0 1 2 5 15
 source ~/sfm/server_sfm/server-sfm.lib
 $DIALOG --clear --title "My  favorite HINDI singer" \
         --menu "Hi, Choose  your favorite HINDI singer:" 20 51 40 \
-"beginCMVSdistribution" "beginCMVSdistribution"\
+"beginCMVSdistribution" "beginCMVSdistribution" \
 "reconstructSFM" "reconstructSFM" \
 "initVars"  "initVars" \
 "initVars_sh_server"  "initVars_sh_server" \
