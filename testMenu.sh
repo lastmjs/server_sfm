@@ -53,7 +53,7 @@ choice=`cat $tempfile`
 
 case $retval in
   0)
-    $choice;;
+    '$choice';;
   1)
     echo "Cancel pressed.";;
   255)
