@@ -815,35 +815,65 @@ waitForMatchesToExport
 done
 }
 
+getCMVSName() {
+#the point of this stoping calling the cmvs dir images from gsearch...
+echo "Getting CMVS Dir Name"
+CMVS_DIR=$(find . -iname "*cmvs" | sed 's/.\///g')
+
+NVM_NAME_DIR=${PWD##*/}
+# echo "NVM_NAME_DIR ="$NVM_NAME_DIR
+# BAD_NVM_NAME="images"
+# if [[ $NVM_NAME_DIR == $BAD_NVM_NAME ]]
+# 	then
+# 		TMP=$(pwd | sed 's/\/images//')
+# 		NVM_NAME_DIR=${TMP##*/}
+# 		NVM_NAME=${NVM_NAME_DIR}.nvm
+# 		#CMVS_PATH=images/
+# 		
+# 		
+# 	else
+# 			
+# 		NVM_NAME=${NVM_NAME_DIR}.nvm
+# fi
+# echo NVM_NAME=$NVM_NAME
+}
 
 reconstructSFM () {
-NVM_NAME=${PWD##*/}.nvm
-VisualSFM sfm+nomatch+cmvs . $NVM_NAME
+getCMVSName
+echo VisualSFM sfm+nomatch+cmvs . $NVM_NAME_DIR
 echo "done sparce reconstruction"
 }
 
 beginCMVSdistribution () {
-CMVSDIR=$NVM_NAME.cmvs
-
+### new personal standard is to call the vsfm project by the parent directory... otherwise this is why this mess is here...
+getCMVSName
+#CMVSDIR=$NVM_NAME.cmvs
 OLD_IFS=$IFS
 INS=$'\r\n' GLOBIGNORE='*' :;
-MODEL_NAME_ARRAY=($(ls -1 | grep [0-9]))
 
-for i in "${MODEL_NAME_ARRAY[@]}"
-do
-   :
-   echo "${MODEL_NAME_ARRAY[$i]}"
-   # do whatever on $i
-done
+	cd $CMVS_DIR
+	MODEL_NAME_ARRAY=($(ls -1 | grep [0-9]))
+	for i in "${MODEL_NAME_ARRAY[@]}" ; 
+		do
+	   		echo "${MODEL_NAME_ARRAY[$i]}"
+	   		#OPTION_ARRAY=($(ls -1 ${MODEL_ARRAY[$i]}/option*))   		
+		   	#cd "${MODEL_NAME_ARRAY[$i]}"
+		   	ls -1 ${MODEL_NAME_ARRAY[$i]}/option* 		
+ 			
+ 			#### pmvs Render server begins here...
+ 			
+ 			
+	    done	  
 
 IFS=$OLD_IFS
+
 }
 
 
 # COMMON FUNCTIONS
 
-	                             #~ ▗▀              ▗   ▝              
-	 #~ ▄▖  ▄▖ ▗▄▄ ▗▄▄  ▄▖ ▗▗▖     ▗▟▄ ▗ ▗ ▗▗▖  ▄▖ ▗▟▄ ▗▄   ▄▖ ▗▗▖  ▄▖ 
+    #~                              ▗▀              ▗   ▝              
+	#~  ▄▖  ▄▖ ▗▄▄ ▗▄▄  ▄▖ ▗▗▖     ▗▟▄ ▗ ▗ ▗▗▖  ▄▖ ▗▟▄ ▗▄   ▄▖ ▗▗▖  ▄▖ 
 	#~ ▐▘▝ ▐▘▜ ▐▐▐ ▐▐▐ ▐▘▜ ▐▘▐      ▐  ▐ ▐ ▐▘▐ ▐▘▝  ▐   ▐  ▐▘▜ ▐▘▐ ▐ ▝ 
 	#~ ▐   ▐ ▐ ▐▐▐ ▐▐▐ ▐ ▐ ▐ ▐      ▐  ▐ ▐ ▐ ▐ ▐    ▐   ▐  ▐ ▐ ▐ ▐  ▀▚ 
 	#~ ▝▙▞ ▝▙▛ ▐▐▐ ▐▐▐ ▝▙▛ ▐ ▐      ▐  ▝▄▜ ▐ ▐ ▝▙▞  ▝▄ ▗▟▄ ▝▙▛ ▐ ▐ ▝▄▞ 
@@ -891,6 +921,10 @@ cat $IPLOGDIR/$CURRENT_INSTANCE_LOG | grep INSTANCE | awk '{print $2}' > $IPLOGD
 
 }
 
+
+testCommandLocal () {
+echo " Check, check...  good check."
+}
 
 #~ archiveImages () {
 #~ tar xf $WORKING_DIR.tar *.JPG
