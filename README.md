@@ -22,6 +22,13 @@ slaves, then they lauch an shell with a screen context so I get around the GL co
 
 Then, go into your Pictures directory, which should be backed up and ONLY contain JPGs!  It deletes the rest... (at a prompt 
 of course).
+Then enter...
+```
+sh ~/sfm/server_sfm/sfm-server.sh
+```
+then watch it go!
+
+One proplem I've noticed using internet pictures is that files with names over about 30 characters are truncated and fail... in which case execute the script ~/sfm/server_sfm/checksiftsarethere.sh and it will populate missing sifts and keep going.  
 
 After the matches have finished, then continue to PMVS, as this has not been built in yet...
 Updates soon,
