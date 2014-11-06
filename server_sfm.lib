@@ -1,0 +1,949 @@
+#aws-sfm.lib
+
+
+echo "	                          _   "
+echo "	 _  _  __    _  __    _ _|___ "
+echo " 	_> (/_ | \_/(/_ |    _>  | |||"
+echo " "
+#set -u
+echo "Booting SFM"
+
+initVars () {
+TESTLOCAL=1 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
+SFM_USERNAME="lastmj"
+MASTER_SERVER="10.0.1.56"
+#SERVER_POSTFIX=".nz.local"
+SERVER_POSTFIX="" # I don't need a postfix for right now
+IP_LOG_DIR=~/sfm/iplog/
+IMG_LOG_DIR=~/sfm/imglogdir/
+WORKING_DIR=$PWD
+SERVER_IP="NULL"
+START_SERVER_IP_RANGE=20
+SERVER_LIST_DIR=~/sfm/servers/
+#SSH_KEY=~/.ssh/sfm.pem
+#SSH_KEY_C=~/.ssh/sfm.pem
+SSH_KEY=~/.ssh/known_hosts
+SSH_KEY_C=~/.ssh/known_hosts
+MATCH_LIST_DIR=$IMG_LOG_DIR/matches/
+SERVER_DIR=~/
+#VSFM_AMI_ID=ami-1b785972
+SERVER_DIR=~/sfm
+   #???
+#echo $UNINITIATED
+JOBS_SET=~/sfm/JOBS/SET
+JOBS_DONE=~/sfm/JOBS/DONE
+HOST_WORKDIR=~/Pictures/sfmWorkDir
+}
+
+
+
+initVars_sh_server () {
+RENDER_SERVER="$HOME/sfm/RENDER_SERVER"
+JOBS_PENDING=$RENDER_SERVER/JOBS_PENDING/
+#RENDER_OUTPUT_MP4=$RENDER_SERVER/MP4_Outputs/
+#JOBS_PENDING_PRORES=$RENDER_SERVER/JOBS_PENDING_PRORES/
+}
+
+initRm () {
+
+echo ""
+echo "About to rm all the stuff in $WORKING_DIR execept the JPGS of course... hit ENTER or CTRL-C to fail"
+ls $PWD
+read nothing
+rm -fr $IMG_LOG_DIR/match* $IMG_LOG_DIR/left_pair $IMG_LOG_DIR/right_pair $IMG_LOG_DIR/*clean_pair* $SERVER_LIST_DIR $HOME/sfm/servers/* $WORKING_DIR/*sift* $WORKING_DIR/match* $MATCH_LIST_DIR/.matchtmp.txt $WORKING_DIR/got_sifts $WORKING_DIR/*.mat $WORKING_DIR/match* $WORKING_DIR/*nvm* $WORKING_DIR/siftlists ~/sfn/online_servers/*
+
+echo "Contents now in $WORKING_DIR/"
+ls $WORKING_DIR
+echo "Hit ENTER again to continue..."
+read nothing_again
+
+}
+
+initDirs () {
+mkdir -p ~/sfm/iplog ~/sfm/imglogdir/matches ~/sfm/servers ~/sfm/online_servers ~/sfm/JOBS/SET ~/sfm/JOBS/DONE $WORKING_DIR/siftlists ~/sfm/online_servers
+}
+
+initClientDirs () {
+mkdir -p ~/sfm/iplog ~/sfm/imglogdir/matches ~/sfm/servers ~/sfm/online_servers ~/sfm/JOBS/SET ~/sfm/JOBS/DONE $WORKING_DIR/siftlists
+}
+
+
+### BEGIN BIG CLEAN UP
+
+								 #~ ███     ▓██▓ 
+								   #~ █    ▒█  █▒
+								   #~ █    █░  ▒█
+								   #~ █    █    █
+								   #~ █    █  █ █
+								   #~ █    █    █
+								   #~ █    █░  ▒█
+								   #~ █    ▒█  █▒
+								 #~ █████   ▓██▓ 
+
+								chooseNumberOfServers () {
+echo "Choose Number of Servers Dan?"
+read NUMBER_OF_SERVERS
+echo "Enter Start IP range @"
+read START_SERVER_IP_RANGE
+}
+
+								 #~ ▒████   ▓██▓ 
+								 #~ █▒  ▓█ ▒█  █▒
+								      #~ █ █░  ▒█
+								     #~ ▒█ █    █
+								    #~ ░█▒ █  █ █
+								   #~ ░█▒  █    █
+								  #~ ▒█▒   █░  ▒█
+								 #~ ▒█░    ▒█  █▒
+								 #~ ██████  ▓██▓
+								  
+									getImgList () {
+									
+ls -1 *.[jJ][Pp][Gg] > $IMG_LOG_DIR/img_list.txt
+IMAGES=`wc -l $IMG_LOG_DIR/img_list.txt | awk '{print$1}'`
+NUMBER_OF_IMAGES=$IMAGES
+echo $IMAGES
+}
+								 #~ ▒████   ▓██▓ 
+								 #~ █▒  ▓█ ▒█  █▒
+								      #~ █ █░  ▒█
+								     #~ ▒█ █    █
+								   #~ ███░ █  █ █
+								     #~ ▓█ █    █
+								      #~ █ █░  ▒█
+								 #~ █░  ▓█ ▒█  █▒
+								 #~ ▒████   ▓██▓ 
+
+								assignIPRange () {
+# works
+
+rm -fr $SERVER_LIST_DIR/serverlist.txt
+
+echo "Sever List Dir is: $SERVER_LIST_DIR"
+
+#replacing ec2 server list with manual server list
+echo "nz7-10432.local" > $SERVER_LIST_DIR/serverlist.txt
+echo "nz7-10500.local" >>$SERVER_LIST_DIR/serverlist.txt
+echo "nz7-10516.local" >>$SERVER_LIST_DIR/serverlist.txt
+CPU_ARRAY=(16 24 24)
+NUMBER_OF_SERVERS=3  # should be wc -l $SERVER_LIST_DIR/serverlist.txt | awk {'print $1'}
+
+#for (( i=1; i<= $NUMBER_OF_SERVERS ; i++ ))
+#	do
+#	SERVER_ASSIGNMENT=$(( START_SERVER_IP_RANGE + i ))
+#	echo "IP address of Server #"$i" will be 10.0.0."$SERVER_ASSIGNMENT
+#	echo 10.0.0.$SERVER_ASSIGNMENT >> $SERVER_LIST_DIR/serverlist.txt
+#done
+}
+								 #~ ▒████   ███▓ 
+								 #~ █▒  ▓█ █▓  █▒
+								      #~ █ █    █
+								     #~ ▒█ █    █
+								   #~ ███░ █▓  ▓█
+								     #~ ▓█  ███▒█
+								      #~ █     ▒█
+								 #~ █░  ▓█ ▓  ▒█░
+								 #~ ▒████  ▒███▒ 
+
+									serverIDs () {
+# not yet imp
+#
+# GET RID OF....
+
+echo "Selecting cluster 1-4"
+read SERVER_SELECTOR
+
+case "$SERVER_SELECTOR" in
+	1) echo "m3.xlarge, 13 ECUs, 4 Cores ( 06 cents / hour )"
+	SERVER_SELECTED="m3.xlarge"
+	;;
+	2) echo "m3.2xlarge, 26 ECUs, 8 Cores (12 cents / hour )"
+	SERVER_SELECTED="m3.2xlarge"
+	;;
+	3) echo "cg1.4xlarge, 35.5 ECUs, 8 Cores (35 cents / hour )"
+	SERVER_SELECTED="cg1.4xlarge"
+	;;
+	4) echo "cc2.8xlarge, 88 ECUs, 8 Cores ( 27 cents / hour )"
+	SERVER_SELECTED="cc2.8xlarge"
+	;;
+esac
+
+}
+				 				  #~ ██   ▓██▓
+			 					   #~ ▒██  ▒█  █▒
+		 						   #~ █░█  █░  ▒█
+	 							  #~ ▓▓ █  █    █
+  								 #~ ░█  █  █  █ █
+								 #~ █▒  █  █    █
+								 #~ ██████ █░  ▒█
+								     #~ █  ▒█  █▒
+								     #~ █   ▓██▓ 
+	
+							     realServerCreation () {
+#testing!
+
+
+#removing since we don't need to boot ec2s
+#for INSTANCE_IP in `cat $SERVER_LIST_DIR/serverlist.txt` ; do
+#
+#ec2-run-instances $VSFM_AMI_ID -g sg-2ad73e45 -k dloud --instance-initiated-shutdown-behavior terminate --private-ip-address $INSTANCE_IP --instance-type $SERVER_SELECTED -s subnet-daead1b1
+#done
+
+SERV_PLAN=`cat $SERVER_LIST_DIR/serverlist.txt | wc -l`
+SERV_ONLINE=`ls -1 ~/sfm/online_servers | wc -l`
+echo SERV_PLAN= $SERV_PLAN SERV_ONLINE= $SERV_ONLINE
+
+while [ "$SERV_ONLINE" -lt "$SERV_PLAN" ]
+	do
+	    echo "Still not enought Servers launched..."
+	    sleep 1
+	    SERV_ONLINE=`ls -1 ~/sfm/online_servers 2>/dev/null | wc -l`
+	    echo SERV_ONLINE = $SERV_ONLINE
+done
+
+echo "looks like all Servers are Online!"
+
+:
+}
+
+
+
+##                                 ###   ##
+##                               ## ##   ##
+##                             ##   ##   ##
+##                           #########   ##
+##                                  ##   ##
+##                                  ##   ##
+                           initRemoteServers () {
+
+
+echo "LS'n servers:"
+for i in `cat $SERVER_LIST_DIR/serverlist.txt` ;do 
+# this line removes the ip from knownhosts to prevent a Spoof Login
+    ssh-keygen -F "~/.ssh/known_hosts" -R $i
+#	ping -c 1 $i
+#	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $SFM_USERNAME@$i:~/sfm/server_sfm/
+# copy yrself yo!
+
+#	ssh -i $SSH_KEY $SFM_USERNAME@$i "killall screen"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
+#	ssh -X -i $SSH_KEY $SFM_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/DONE"
+	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p $HOST_WORKDIR"
+
+
+done
+
+}
+
+#scp -i ~/dloud.pem -r $1 $SFM_USERNAME@10.0.0.164:~/
+#40r
+
+
+
+
+
+
+
+
+fakeServerCreation () {
+# works...  
+mkdir -p $SERVER_LIST_DIR/fake_servers
+
+for i in `cat $SERVER_LIST_DIR/serverlist.txt` ; do
+mkdir -p $SERVER_LIST_DIR/fake_servers/$i
+
+done
+
+echo "LS'n $SERVER_LIST_DIR/fake_servers:"
+ls $SERVER_LIST_DIR/fake_servers
+}
+
+								 #~ █████   ▓██▓ 
+								 #~ █      ▒█  █▒
+								 #~ █      █░  ▒█
+								 #~ ████▒  █    █
+								    #~ ░█▓ █  █ █
+								      #~ █ █    █
+								      #~ █ █░  ▒█
+								 #~ █░  █▓ ▒█  █▒
+								 #~ ▒███▓   ▓██▓ 
+
+								 copyImagesToRealServers () {
+
+echo in CopyImagesToRealServers
+
+echo "Tarrring"
+tar cf imageArchive.tar --directory=$WORKING_DIR/ *.[jJ][pP][gG]
+
+for i in `cat $SERVER_LIST_DIR/serverlist.txt`
+do 
+    #for j in `cat $IMG_LOG_DIR/img_list.txt` ;do	
+    ssh-keygen -F "~/.ssh/known_hosts" -R $i 1>&2
+		scp -i $SSH_KEY imageArchive.tar $i:$HOST_WORKDIR &
+		#scp -i $SSH_KEY $j $i:$HOST_WORKDIR
+	#done
+done
+wait
+
+count=1
+for i in `cat $SERVER_LIST_DIR/serverlist.txt`
+do
+		
+			CURRENT_SERVER=`sed -n "$count"p $SERVER_LIST_DIR/serverlist.txt` 
+			echo server $CURRENT_SERVER number $i
+
+			#scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$HOST_WORKDIR
+
+			ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "cd $HOST_WORKDIR ; tar xf $HOST_WORKDIR/imageArchive.tar &"
+			((count++))
+done
+}
+
+
+
+
+#50-r
+copyImagesToFakeServers () {
+for i in `cat $SERVER_LIST_DIR/serverlist.txt`
+do 
+     for j in `cat $IMG_LOG_DIR/img_list.txt`
+	do
+	
+	cp -v $j $SERVER_LIST_DIR/fake_servers/$i
+
+# this works... but it makes the sifts back in the original locaiton!!!
+#     	ln -s $WORKING_DIR/$j $SERVER_LIST_DIR/fake_servers/$i/$j
+
+	done
+done
+}
+
+								              #~ 
+								  #~ ▒███▒  ▓██▓ 
+								 #~ ░█▒  ▓ ▒█  █▒
+								 #~ █▒     █░  ▒█
+								 #~ █▒███  █    █
+								 #~ █▓  ▓█ █  █ █
+								 #~ █    █ █    █
+								 #~ █    █ █░  ▒█
+								 #~ ▒▓  ▓█ ▒█  █▒
+								  #~ ▓███   ▓██▓ 
+
+								siftListsPerServer () {
+
+
+images=$NUMBER_OF_IMAGES
+servers=$NUMBER_OF_SERVERS
+ips=$(( $images / $servers ))
+remainder=$(( $images % $servers ))
+echo Images Per Segment $ips Remainder: $remainder
+
+count=1
+	for ((i=1 ; i<=$servers; i++)) ; 
+	do
+		echo "siftListsPerServer" loop number $i
+			if [ "$remainder" -ge 1 ]
+		then 
+		# we still have a remainder
+			add=1
+		else 
+		# we no longer have a remainder
+			add=0
+	fi	
+		
+	for ((j=1 ; j<= $(( $ips + $add )) ; j++))
+		do echo $i $j
+			if [ "$TESTLOCAL" -eq 0 ]
+				then
+					sed -n "$count"p $IMG_LOG_DIR/img_list.txt >> siftlists/"$i"_siftlist.txt
+				else
+					echo $WORKING_DIR/`sed -n "$count"p $IMG_LOG_DIR/img_list.txt` >> siftlists/"$i"_siftlist.txt
+				fi
+						#sed -n "$count"p $IMG_LOG_DIR/img_list.txt >> siftlists/"$i"_siftlist.txt
+			((count++))
+		done
+	((remainder--))
+	done
+# That's assuming each machine is the same speed!, otherwise we'll need load balancing!
+}
+								 #~ ██████  ▓██▓ 
+								     #~ ▓▓ ▒█  █▒
+								     #~ █  █░  ▒█
+								    #~ ▒█  █    █
+								    #~ █░  █  █ █
+								   #~ ▒█   █    █
+								   #~ █░   █░  ▒█
+								  #~ ▒█    ▒█  █▒
+								  #~ █▒     ▓██▓ 
+
+								copyListsToRealServers () {
+	
+echo "In copyListsToRealServers"
+
+j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1}'`
+	for (( i=1; i <= $j ; i++ ))
+		do
+			CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt` 
+			echo server $CURRENT_SERVER number $i
+
+			scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$HOST_WORKDIR
+		done
+echo "leaving cLTRS"
+}
+
+#R
+copyListsToFakeServers () {
+	echo "In copyListsToFakeServers"
+	
+
+	j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1}'`
+	for (( i=1; i <= $j ; i++ ))
+		do
+			CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt` 
+			echo server $CURRENT_SERVER number $i
+			cp -v $WORKING_DIR/matchlist_$i.txt $SERVER_LIST_DIR/fake_servers/$CURRENT_SERVER/
+
+			cp -v $WORKING_DIR/siftlists/"$i"_siftlist.txt $SERVER_LIST_DIR/fake_servers/$CURRENT_SERVER/
+		done
+echo "leaving cLTFS"
+}
+
+											              #~ 
+								 #~ ░████░  ▓██▓ 
+								 #~ █▒  ▒█ ▒█  █▒
+								 #~ █    █ █░  ▒█
+								 #~ █▒  ▒█ █    █
+								  #~ ████  █  █ █
+								 #~ █▒  ▓█ █    █
+								 #~ █    █ █░  ▒█
+								 #~ █▓  ▒█ ▒█  █▒
+								 #~ ░████░  ▓██▓
+								 				  
+								startRealSifts () {
+
+j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
+
+	for (( i=1 ; i <= $j ; i++)) ; do
+		CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
+		echo "Creating SiftSH for $CURRENT_SERVER"
+		
+		##### WHERE YO AT YO
+		#echo cd "$HOME"/.aws/servers/fake_servers/"$CURRENT_SERVER"/ 	 > $JOBS_SET/"$i"_JOB.sh
+		#echo "echo your pwd is: \$PWD" 									>> $JOBS_SET/"$i"_JOB.sh
+		echo cd $HOST_WORKDIR > $JOBS_SET/"$i"_sift_JOB.sh
+		echo VisualSFM siftgpu "$i"_siftlist.txt >> $JOBS_SET/"$i"_sift_JOB.sh
+#		echo scpHome *.sift $WORKING_DIR 	 >> $JOBS_SET/"$i"_sift_JOB.sh
+		echo scp -i $SSH_KEY_C -r *.sift $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
+
+	
+		chmod +x $JOBS_SET/"$i"_sift_JOB.sh
+		
+		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
+
+		IN_FILE="$i"_sift_JOB.sh 
+		ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+
+#		scpToCueIp "$i"_JOB.sh $CURRENT_SERVER
+		
+		mv $JOBS_SET/"$i"_sift_JOB.sh $JOBS_DONE/
+	done
+}
+
+#80R
+startFakeSifts () {
+
+j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
+for (( i=1 ; i <= $j ; i++))
+do
+CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
+echo "Creating SiftSH for $CURRENT_SERVER"
+echo VisualSFM siftgpu $HOME/.aws/servers/fake_servers/"$CURRENT_SERVER"/"$i"_siftlist.txt
+echo cd "$HOME"/.aws/servers/fake_servers/"$CURRENT_SERVER"/ > $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_JOB.sh
+echo "echo your pwd is: \$PWD" >> $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_JOB.sh
+echo cd "$HOME"/.aws/servers/fake_servers/"$CURRENT_SERVER"/
+echo VisualSFM siftgpu $HOME/.aws/servers/fake_servers/"$CURRENT_SERVER"/"$i"_siftlist.txt >> $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_JOB.sh
+echo cp *.sift $WORKING_DIR >> $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_JOB.sh
+chmod +x $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_JOB.sh
+mv $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_JOB.sh $HOME/RENDER_SERVER/JOBS_PENDING/
+
+done
+}
+
+												              #~ 
+								  #~ ███▓   ▓██▓ 
+								 #~ █▓  █▒ ▒█  █▒
+								 #~ █    █ █░  ▒█
+								 #~ █    █ █    █
+								 #~ █▓  ▓█ █  █ █
+								  #~ ███▒█ █    █
+								     #~ ▒█ █░  ▒█
+								 #~ ▓  ▒█░ ▒█  █▒
+								 #~ ▒███▒   ▓██▓ 				
+
+								waitForSiftsToFinish () {
+
+DIR_SIFTS=`ls -1 $WORKING_DIR/*.sift 2>/dev/null | wc -l`
+DIR_PEGS=`ls -1 $WORKING_DIR/*.[jJ][pP][gG] | wc -l`
+echo DIR_SIFTS= $DIR_SIFTS DIR_PEGS= $DIR_PEGS
+#
+
+while [ "$DIR_SIFTS" -lt "$DIR_PEGS" ]
+do
+    echo "Still not enought sifts back..."
+    sleep 1
+    DIR_SIFTS=`ls -1 $WORKING_DIR/*.sift 2>/dev/null | wc -l`
+    echo DIR_SIFTS = $DIR_SIFTS
+done
+echo "looks like yr done"
+
+}
+
+					                     
+				#				 ███     ▓██▓   ▓██▓ 
+				#				   █    ▒█  █▒ ▒█  █▒
+				#				   █    █░  ▒█ █░  ▒█
+				#				   █    █    █ █    █
+				#				   █    █    █ █    █
+				#				   █    █░  ▒█ █░  ▒█
+				# 				   █    ▒█  █▒ ▒█  █▒
+				#				 █████   ▓██▓   ▓██▓ 
+
+								 getInverseSifts () {
+
+j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
+for (( i=1 ; i <= $j ; i++)) ; do
+
+CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
+#sould become function (getLoopCurrentServerID#
+	cat <<EOF > $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
+cd $HOST_WORKDIR
+echo MY PWD IS... $PWD
+#rm getRemainingSifts.txt   
+MAIN=".sift"
+INVERT=".JPG"
+ls -1 *.sift > .main_list
+ls -1 *[jJ][pP][gG] > .invert_list
+echo "sed1"
+sed "s/.[jJ][pP][gG]//g" .invert_list > .invert_no_ext
+echo "sed2"
+sed "s/.sift//g" .main_list > .main_no_ext
+echo "sed3"
+sdiff .invert_no_ext .main_no_ext | grep "<" | sed 's/<//g'
+sdiff .invert_no_ext .main_no_ext | grep "<" | sed 's/<//g' > .outlist_prext.txt
+for i in \`cat .outlist_prext.txt\` 
+	do 
+		#cp /media/ephemeral/\$i.sift . ;done 
+		scp -i $SSH_KEY_C $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR/\$i.sift . ;
+		done
+rm .outlist_prext.txt
+#touch $WORKING_DIR/got_sifts_$i
+ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $SFM_USERNAME@$MASTER_SERVER	 "touch $WORKING_DIR/got_sifts_$i"
+EOF
+
+chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
+#mv $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_SIFT_MOVE_JOB.sh $HOME/RENDER_SERVER/JOBS_PENDING/
+
+scp -i $SSH_KEY $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
+
+IN_FILE="$i"_SIFT_MOVE_JOB.sh
+ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+mv $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $JOBS_DONE/"$i"_SIFT_MOVE_JOB.sh
+
+done
+
+}
+                
+								# ███    ███     ▓██▓ 
+								#   █      █    ▒█  █▒
+								#   █      █    █░  ▒█
+								#   █      █    █    █	
+								#   █      █    █  █ █
+								#   █      █    █    █
+								#   █      █    █░  ▒█
+								#   █      █    ▒█  █▒
+								# █████  █████   ▓██▓ 
+
+								 waitForSiftsToCopy () {
+DOES_SIFT_EXIST=0
+while [ "$DOES_SIFT_EXIST" -lt "$NUMBER_OF_SERVERS" ]
+do 
+    echo "Waiting for sifts to copy..."
+    echo "DOES_SIFT_EXIST = $DOES_SIFT_EXIST"
+DOES_SIFT_EXIST=`ls -1 $WORKING_DIR/*got_sifts* 2>/dev/null | wc -l`
+    sleep 1
+done
+echo "All Sifts at home exist"
+}
+
+								 #~ ███    ▒████   ▓██▓ 
+								   #~ █    █▒  ▓█ ▒█  █▒
+								   #~ █         █ █░  ▒█
+								   #~ █        ▒█ █    █
+								   #~ █       ░█▒ █  █ █
+								   #~ █      ░█▒  █    █
+								   #~ █     ▒█▒   █░  ▒█
+								   #~ █    ▒█░    ▒█  █▒
+								 #~ █████  ██████  ▓██▓ 
+
+									getMatchListTotal () {
+
+
+#iterate through each primary image
+TOTALCOUNT=0
+
+OLD_IFS=$IFS
+IFS=$'\r\n' GLOBIGNORE='*' :;
+FILENAMEARRAY=($(cat $IMG_LOG_DIR/img_list.txt))
+
+for (( c = 1; c <= $IMAGES; c++ ))
+	do
+	MATCHBEGIN=$(( c + 1 ))
+	MATCHLOOP=$(( c + 1 ))
+
+		#itterate through each image to match
+		for (( $MATCHLOOP ; $MATCHLOOP<=$IMAGES; MATCHLOOP++ ))
+			do 
+			((TOTALCOUNT++))
+			#SECONDPAIR=`sed -n "$MATCHLOOP"p $IMG_LOG_DIR/img_list.txt`
+			SECONDPAIR=${FILENAMEARRAY[$MATCHLOOP]}
+			MAINPAIR=${FILENAMEARRAY[$c]}
+			#MAINPAIR=`sed -n "$c"p $IMG_LOG_DIR/img_list.txt`
+			#	if [ "$TESTLOCAL" -eq 0 ]
+			#then 
+				echo $MAINPAIR $SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
+			#else
+			#echo $WORKING_DIR/$MAINPAIR $WORKING_DIR/$SECONDPAIR >> $MATCH_LIST_DIR/.matchtmp.txt
+			#	fi		
+		done
+done
+IFS=$OLD_IFS
+
+echo TOTAL COUNT = $TOTALCOUNT
+echo 
+PER_SERVER=$(( TOTALCOUNT / NUMBER_OF_SERVERS ))
+REMAINDER=$(( TOTALCOUNT % NUMBER_OF_SERVERS ))
+echo "Number of Pix per server is " $PER_SERVER
+echo "Remainder ="$REMAINDER
+
+}
+								
+								 #~ ███    ▒████   ▓██▓ 
+								   #~ █    █▒  ▓█ ▒█  █▒
+								   #~ █         █ █░  ▒█
+								   #~ █        ▒█ █    █
+								   #~ █      ███░ █  █ █
+								   #~ █        ▓█ █    █
+								   #~ █         █ █░  ▒█
+								   #~ █    █░  ▓█ ▒█  █▒
+								 #~ █████  ▒████   ▓██▓ 
+
+									makeMatchLists () {
+getMatchListTotal
+
+# make the lists for each server
+for (( c=1; c<=$NUMBER_OF_SERVERS; c++ ))
+	do
+	echo "$c ****************************"
+	STARTLINE=$(( c * PER_SERVER - PER_SERVER + 1))
+	if [ "$c" -eq $NUMBER_OF_SERVERS ]
+	then 
+		echo "I'm on the last loop!!!"
+		ENDLINE=$(( c * PER_SERVER + REMAINDER ))
+                echo $STARTLINE $ENDLINE
+                sed -n "$STARTLINE","$ENDLINE"p $MATCH_LIST_DIR/.matchtmp.txt  > $WORKING_DIR/matchlist_$c.txt
+	else
+		ENDLINE=$(( c * PER_SERVER ))
+        	echo $STARTLINE $ENDLINE
+        	sed -n "$STARTLINE","$ENDLINE"p $MATCH_LIST_DIR/.matchtmp.txt  > $WORKING_DIR/matchlist_$c.txt 
+	fi
+CURRENT_SERVER=`sed -n "$c"p $SERVER_LIST_DIR/serverlist.txt`
+scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SFM_USERNAME@$CURRENT_SERVER:$HOST_WORKDIR
+
+done                     
+}
+														
+								 #~ ███       ██   ▓██▓ 
+								   #~ █      ▒██  ▒█  █▒
+								   #~ █      █░█  █░  ▒█
+								   #~ █     ▓▓ █  █    █
+								   #~ █    ░█  █  █  █ █
+								   #~ █    █▒  █  █    █
+								   #~ █    ██████ █░  ▒█
+								   #~ █        █  ▒█  █▒
+								 #~ █████      █   ▓██▓ 
+							
+								startMatchesOnServers () {
+
+
+#adding a very basic load balancer to it...
+# split image list into 20, then keep... 
+# need to make the job dispatcher first.
+
+NUMBER_OF_MATCHLISTS=20
+
+j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
+for (( i=1 ; i <= $j ; i++ )) ; do 
+#for (( i=1 ; i <= $NUMBER_OF_MATCHLISTS ; i++ )) ; do 
+	CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
+
+	cat <<EOF > $JOBS_SET/"$i"_MATCH_JOB.sh
+	cd $HOST_WORKDIR
+
+	VisualSFM sfm+pairs+skipsfm . nomatch.nvm matchlist_$i.txt
+	VisualSFM sfm+skipsfm+exportp . matches_out_$i.txt
+	scp -i $SSH_KEY_C matches_out_$i.txt $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR/
+	#cp matches_out_$i.txt $WORKING_DIR/
+EOF
+
+	chmod +x $JOBS_SET/"$i"_MATCH_JOB.sh
+	#mv $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_MATCH_JOB.sh $HOME/RENDER_SERVER/JOBS_PENDING/
+	scp -i $SSH_KEY $JOBS_SET/"$i"_MATCH_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
+	IN_FILE="$i"_MATCH_JOB.sh
+	ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+
+done
+}
+							
+							
+								  #~ ███    █████   ▓██▓ 
+								   #~ █    █      ▒█  █▒
+								   #~ █    █      █░  ▒█
+								   #~ █    ████▒  █    █
+								   #~ █       ░█▓ █  █ █
+								   #~ █         █ █    █
+								   #~ █         █ █░  ▒█
+								   #~ █    █░  █▓ ▒█  █▒
+								 #~ █████  ▒███▓   ▓██▓ 
+
+								waitForMatchesToExport () {
+DOES_MAT_EXIST=0
+while [ "$DOES_MAT_EXIST" -lt "$NUMBER_OF_SERVERS" ]
+do 
+  echo "Waiting for Matches to copy..."
+  echo "DOES_MAT_EXIST = $DOES_MAT_EXIST"
+  DOES_MAT_EXIST=`ls -1 $WORKING_DIR/matches_out* 2>/dev/null | wc -l`
+    sleep 1
+  done
+  echo "All Match Exports at home exist"
+}
+
+copyFakeSiftsToHosts () {
+
+:
+# doing this in startFakeSifts function
+}
+
+								 #~ ███     ▒███▒  ▓██▓ 
+								   #~ █    ░█▒  ▓ ▒█  █▒
+								   #~ █    █▒     █░  ▒█
+								   #~ █    █▒███  █    █
+								   #~ █    █▓  ▓█ █  █ █
+								   #~ █    █    █ █    █
+								   #~ █    █    █ █░  ▒█
+								   #~ █    ▒▓  ▓█ ▒█  █▒
+								 #~ █████   ▓███   ▓██▓ 
+combineMatch () {
+
+for i in `ls -1 $WORKING_DIR/matches_out*` ; do
+echo $i
+sed "s/.*\///" $i > `basename $i .txt`_local_path.txt
+VisualSFM sfm+skip+import+skipsfm . out.nvm `basename $i .txt`_local_path.txt
+
+done
+#VisualSFM sfm+exportp [input] matches.txt
+#VisualSFM sfm+skip+import+skipsfm [full_image_list] [output.nvm] matches1.txt
+#VisualSFM sfm+skip+import+skipsfm [full_image_list] [output.nvm] matchesn.txt
+
+}
+								 #~ ███    ██████  ▓██▓ 
+								   #~ █        ▓▓ ▒█  █▒
+								   #~ █        █  █░  ▒█
+								   #~ █       ▒█  █    █
+								   #~ █       █░  █  █ █
+								   #~ █      ▒█   █    █
+								   #~ █      █░   █░  ▒█
+								   #~ █     ▒█    ▒█  █▒
+								 #~ █████   █▒     ▓██▓ 
+
+function copyMatchesToRealServers () {
+
+for i in `cat $SERVER_LIST_DIR/serverlist.txt`
+do 
+scp -i $SSH_KEY *.mat $i:$HOST_WORKDIR
+#     for j in `ls -1 $WORKING_DIR/*.mat`
+#	do
+#	scp -i dloud.pem $j $i:/media/ephemeral
+#	done
+done
+}
+
+#170R
+copyMatchesToFakeServers () {
+
+for i in `cat $SERVER_LIST_DIR/serverlist.txt`
+do 
+     for j in `ls -1 $WORKING_DIR/*.mat`
+	do
+	cp -v $j $SERVER_LIST_DIR/fake_servers/$i
+	done
+done
+}
+
+
+								  #~ ███    ░████░  ▓██▓ 
+								   #~ █    █▒  ▒█ ▒█  █▒
+								   #~ █    █    █ █░  ▒█
+								   #~ █    █▒  ▒█ █    █
+								   #~ █     ████  █  █ █
+								   #~ █    █▒  ▓█ █    █
+								   #~ █    █    █ █░  ▒█
+								   #~ █    █▓  ▒█ ▒█  █▒
+								 #~ █████  ░████░  ▓██▓ 
+
+
+
+
+disconnectAllServers () {
+#not yet imp
+for j in `ls -1 $IP_LOG_DIR`
+do
+waitForMatchesToExport
+	echo "About to disconnect servers"
+	if [ "$SERVER_IP" == "$MASTERSERVER" ]
+		then
+			echo "Not disconnecting host!";
+		else
+			echo "Disconnecting " $j;
+			ec2-terminate-instances `cat $j`;
+	fi
+done
+}
+
+getCMVSName() {
+#the point of this stoping calling the cmvs dir images from gsearch...
+echo "Getting CMVS Dir Name"
+CMVS_DIR=$(find . -iname "*cmvs" | sed 's/.\///g')
+
+NVM_NAME_DIR=${PWD##*/}
+# echo "NVM_NAME_DIR ="$NVM_NAME_DIR
+# BAD_NVM_NAME="images"
+# if [[ $NVM_NAME_DIR == $BAD_NVM_NAME ]]
+# 	then
+# 		TMP=$(pwd | sed 's/\/images//')
+# 		NVM_NAME_DIR=${TMP##*/}
+# 		NVM_NAME=${NVM_NAME_DIR}.nvm
+# 		#CMVS_PATH=images/
+# 		
+# 		
+# 	else
+# 			
+# 		NVM_NAME=${NVM_NAME_DIR}.nvm
+# fi
+# echo NVM_NAME=$NVM_NAME
+}
+
+reconstructSFM () {
+getCMVSName
+echo VisualSFM sfm+nomatch+cmvs . $NVM_NAME_DIR
+echo "done sparce reconstruction"
+}
+
+beginCMVSdistribution () {
+### new personal standard is to call the vsfm project by the parent directory... otherwise this is why this mess is here...
+getCMVSName
+#CMVSDIR=$NVM_NAME.cmvs
+OLD_IFS=$IFS
+INS=$'\r\n' GLOBIGNORE='*' :;
+
+	cd $CMVS_DIR
+	MODEL_NAME_ARRAY=($(ls -1 | grep [0-9]))
+	for i in "${MODEL_NAME_ARRAY[@]}" ; 
+		do
+	   		echo "${MODEL_NAME_ARRAY[$i]}"
+	   		#OPTION_ARRAY=($(ls -1 ${MODEL_ARRAY[$i]}/option*))   		
+		   	#cd "${MODEL_NAME_ARRAY[$i]}"
+		   	ls -1 ${MODEL_NAME_ARRAY[$i]}/option* 		
+ 			
+ 			#### pmvs Render server begins here...
+ 			
+ 			
+	    done	  
+
+IFS=$OLD_IFS
+
+}
+
+
+# COMMON FUNCTIONS
+
+    #~                              ▗▀              ▗   ▝              
+	#~  ▄▖  ▄▖ ▗▄▄ ▗▄▄  ▄▖ ▗▗▖     ▗▟▄ ▗ ▗ ▗▗▖  ▄▖ ▗▟▄ ▗▄   ▄▖ ▗▗▖  ▄▖ 
+	#~ ▐▘▝ ▐▘▜ ▐▐▐ ▐▐▐ ▐▘▜ ▐▘▐      ▐  ▐ ▐ ▐▘▐ ▐▘▝  ▐   ▐  ▐▘▜ ▐▘▐ ▐ ▝ 
+	#~ ▐   ▐ ▐ ▐▐▐ ▐▐▐ ▐ ▐ ▐ ▐      ▐  ▐ ▐ ▐ ▐ ▐    ▐   ▐  ▐ ▐ ▐ ▐  ▀▚ 
+	#~ ▝▙▞ ▝▙▛ ▐▐▐ ▐▐▐ ▝▙▛ ▐ ▐      ▐  ▝▄▜ ▐ ▐ ▝▙▞  ▝▄ ▗▟▄ ▝▙▛ ▐ ▐ ▝▄▞ 
+
+#~ 
+#~ copyBackGlob () {
+	#~ scp 'SERVERNAME:/DIR/\*' .
+#~ }
+
+
+
+scpTo () {
+	echo "in function scpTO!"
+	SCP_FILE=$1
+	DEST_IP=$2
+	SCP_REMOTE_DIR=$3
+	scp -i $SSH_KEY -r $SCP_FILE $SFM_USERNAME@$DEST_IP:$SCP_DIR
+}
+
+scpToCueIp () {
+	echo "in function scpToCueIp"
+	IN_FILE=$1
+	DEST_IP=$2
+	ssh -i $SSH_KEY $SFM_USERNAME@$DEST_IP "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+
+	# ssh -i ~/dsw/aws/dloud.pem $SFM_USERNAME@107.23.25.221 "RFILE=$FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+}	
+
+scpHome () {
+	echo "in function scpHome!"
+	IN_FILE=$1
+	DEST_IP=$HOME_IP
+	scp -i $SSH_KEY -r $SCP_FILE $SFM_USERNAME@$DEST_IP:$WORKING_DIR
+	:
+}
+
+writeIPInstanceID () {
+
+CURRENT_INSTANCE_IP=$1
+CURRENT_INSTANCE_LOG=$2
+#first make a file with the ip address name
+touch `cat $IPLOGDIR/$CURRENT_INSTANCE_LOG | grep PRIVATEIPADDRESS | awk '{print $2}'` 
+#then echo that into the file
+cat $IPLOGDIR/$CURRENT_INSTANCE_LOG | grep INSTANCE | awk '{print $2}' > $IPLOGDIR/$CURRENT_INSTANCE_IP
+
+}
+
+
+testCommandLocal () {
+echo " Check, check...  good check."
+}
+
+#~ archiveImages () {
+#~ tar xf $WORKING_DIR.tar *.JPG
+#~ IMAGE_BUNDLE=$WORKING_DIR.tar
+#~ echo "IMAGE_BUNDLE = $IMAGE_BUNDLE"
+#~ }
+# echo "		             ▄▄▖             ▄▄           ▗▄▖    █  ▗▖   "
+# echo "		            ▐▀▀█▖           ▐▛▀           ▝▜▌    ▀  ▐▌   "
+# echo "		   ▟█▙  ▟██▖   ▐▌     ▗▟██▖▐███ ▐█▙█▖      ▐▌   ██  ▐▙█▙ "
+# echo "		  ▐▙▄▟▌▐▛  ▘  ▗▛      ▐▙▄▖▘ ▐▌  ▐▌█▐▌      ▐▌    █  ▐▛ ▜▌"
+# echo "		  ▐▛▀▀▘▐▌    ▗▛        ▀▀█▖ ▐▌  ▐▌█▐▌      ▐▌    █  ▐▌ ▐▌"
+# echo "		  ▝█▄▄▌▝█▄▄▌▗█▄▄▖     ▐▄▄▟▌ ▐▌  ▐▌█▐▌  █   ▐▙▄ ▗▄█▄▖▐█▄█▘"
+# echo "		   ▝▀▀  ▝▀▀ ▝▀▀▀▘      ▀▀▀  ▝▘  ▝▘▀▝▘  ▀    ▀▀ ▝▀▀▀▘▝▘▀▘ "
+
