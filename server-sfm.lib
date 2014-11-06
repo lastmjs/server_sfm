@@ -10,8 +10,8 @@ echo "Booting SFM"
 
 initVars () {
 TESTLOCAL=1 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
+SFM_USERNAME="lastmj"
 MASTER_SERVER="10.0.1.56"
-
 #SERVER_POSTFIX=".nz.local"
 SERVER_POSTFIX="" # I don't need a postfix for right now
 IP_LOG_DIR=~/sfm/iplog/
@@ -26,7 +26,6 @@ SSH_KEY=~/.ssh/knownhosts
 SSH_KEY_C=~/.ssh/knownhosts
 MATCH_LIST_DIR=$IMG_LOG_DIR/matches/
 SERVER_DIR=~/
-SFM_USERNAME="lastmj"
 #VSFM_AMI_ID=ami-1b785972
 SERVER_DIR=~/sfm
    #???
