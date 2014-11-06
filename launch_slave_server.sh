@@ -19,7 +19,7 @@ else
     OSTYPE="MACOSX"
 fi
 
-. ~/sfm/server_sfm/server_sfm.lib
+. ~/sfm/server_sfm/sfm_server.lib
 #. ~/dsw/video_server/ds_common.lib
 mkdir -p ~/sfm/serverID/
 

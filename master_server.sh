@@ -3,7 +3,7 @@
 
 #known functions and execution order to be added.
 
-. ~/sfm/server_sfm/server-sfm.lib
+. ~/sfm/server_sfm/sfm_server.lib
 
 ### WORKING FUNCTIONS
 
