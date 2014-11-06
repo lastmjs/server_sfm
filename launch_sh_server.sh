@@ -28,7 +28,7 @@ initVars
 initClientDirs
 echo "SERVER_POSTFIX="$SERVER_POSTFIX
 
-if [ OSTYPE == "LINUX" ]
+if [ $OSTYPE == "LINUX" ]
 then
     LOCALHOSTNAME=`hostname`; echo $LOCALHOSTNAME
 else
