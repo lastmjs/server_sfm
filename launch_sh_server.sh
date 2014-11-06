@@ -11,6 +11,14 @@
 
 #   -o BatchMode=yes -o StrictHostKeyChecking=no
 
+OSTYPE=""
+if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]
+then
+    OSTYPE="LINUX"
+else
+    OSTYPE="MACOSX"
+fi
+
 . ~/sfm/server_sfm/server-sfm.lib
 #. ~/dsw/video_server/ds_common.lib
 mkdir -p ~/sfm/serverID/
@@ -19,7 +27,13 @@ mkdir -p ~/sfm/serverID/
 initVars
 initClientDirs
 echo "SERVER_POSTFIX="$SERVER_POSTFIX
-LOCALHOSTNAME=`scutil --get LocalHostName`; echo $LOCALHOSTNAME
+
+if [ OSTYPE == "LINUX" ]
+then
+    LOCALHOSTNAME=`hostname`; echo $LOCALHOSTNAME
+else
+    LOCALHOSTNAME=`scutil --get LocalHostName`; echo $LOCALHOSTNAME
+fi
 FULLHOSTNAME="$LOCALHOSTNAME$SERVER_POSTFIX"
 
 echo $FULLHOSTNAME > ~/sfm/serverID/$FULLHOSTNAME
