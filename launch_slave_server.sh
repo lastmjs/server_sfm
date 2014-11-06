@@ -37,7 +37,7 @@ fi
 FULLHOSTNAME="$LOCALHOSTNAME$SERVER_POSTFIX"
 
 echo $FULLHOSTNAME > ~/sfm/serverID/$FULLHOSTNAME
-scp -i $SSH_KEY -r ~/sfm/serverID/$FULLHOSTNAME $SFM_USERNAME@$MASTER_SERVER:~/sfm/online_servers/
+scp -i $SSH_KEY -r ~/sfm/serverID/$FULLHOSTNAME $MASTER_USERNAME@$MASTER_SERVER:~/sfm/online_servers/
 
 
 
