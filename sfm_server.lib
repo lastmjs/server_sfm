@@ -10,7 +10,8 @@ echo "Booting SFM"
 
 initVars () {
 TESTLOCAL=1 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
-SFM_USERNAME="byuarchaeology"
+MASTER_USERNAME="lastmj"
+SLAVE_USERNAME="byuarchaeology"
 MASTER_SERVER="10.0.1.56"
 #SERVER_POSTFIX=".nz.local"
 SERVER_POSTFIX="" # I don't need a postfix for right now
@@ -223,24 +224,24 @@ for i in `cat $SERVER_LIST_DIR/serverlist.txt` ;do
 # this line removes the ip from knownhosts to prevent a Spoof Login
     ssh-keygen -F "~/.ssh/known_hosts" -R $i
 #	ping -c 1 $i
-#	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
-#	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $SFM_USERNAME@$i:~/sfm/server_sfm/
-#	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $SFM_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $MASTER_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $MASTER_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $MASTER_USERNAME@$i:~/sfm/server_sfm/
 # copy yrself yo!
 
-#	ssh -i $SSH_KEY $SFM_USERNAME@$i "killall screen"
-	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
-#	ssh -X -i $SSH_KEY $SFM_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
-	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/SET"
-	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p ~/JOBS/DONE"
-	ssh -i $SSH_KEY $SFM_USERNAME@$i "mkdir -p $HOST_WORKDIR"
+#	ssh -i $SSH_KEY $MASTER_USERNAME@$i "killall screen"
+	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p ~/JOBS/SET"
+#	ssh -X -i $SSH_KEY $MASTER_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
+	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p ~/JOBS/SET"
+	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p ~/JOBS/DONE"
+	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p $HOST_WORKDIR"
 
 
 done
 
 }
 
-#scp -i ~/dloud.pem -r $1 $SFM_USERNAME@10.0.0.164:~/
+#scp -i ~/dloud.pem -r $1 $MASTER_USERNAME@10.0.0.164:~/
 #40r
 
 
@@ -299,7 +300,7 @@ do
 
 			#scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$HOST_WORKDIR
 
-			ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "cd $HOST_WORKDIR ; tar xf $HOST_WORKDIR/imageArchive.tar &"
+			ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "cd $HOST_WORKDIR ; tar xf $HOST_WORKDIR/imageArchive.tar &"
 			((count++))
 done
 }
@@ -438,7 +439,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		echo cd $HOST_WORKDIR > $JOBS_SET/"$i"_sift_JOB.sh
 		echo VisualSFM siftgpu "$i"_siftlist.txt >> $JOBS_SET/"$i"_sift_JOB.sh
 #		echo scpHome *.sift $WORKING_DIR 	 >> $JOBS_SET/"$i"_sift_JOB.sh
-		echo scp -i $SSH_KEY_C -r *.sift $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
+		echo scp -i $SSH_KEY_C -r *.sift $MASTER_USERNAME@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
 
 	
 		chmod +x $JOBS_SET/"$i"_sift_JOB.sh
@@ -446,7 +447,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 
 		IN_FILE="$i"_sift_JOB.sh 
-		ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+		ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
 #		scpToCueIp "$i"_JOB.sh $CURRENT_SERVER
 		
@@ -538,11 +539,11 @@ sdiff .invert_no_ext .main_no_ext | grep "<" | sed 's/<//g' > .outlist_prext.txt
 for i in \`cat .outlist_prext.txt\` 
 	do 
 		#cp /media/ephemeral/\$i.sift . ;done 
-		scp -i $SSH_KEY_C $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR/\$i.sift . ;
+		scp -i $SSH_KEY_C $MASTER_USERNAME@$MASTER_SERVER:$WORKING_DIR/\$i.sift . ;
 		done
 rm .outlist_prext.txt
 #touch $WORKING_DIR/got_sifts_$i
-ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $SFM_USERNAME@$MASTER_SERVER	 "touch $WORKING_DIR/got_sifts_$i"
+ssh -i $SSH_KEY_C -o "StrictHostKeyChecking no" $MASTER_USERNAME@$MASTER_SERVER	 "touch $WORKING_DIR/got_sifts_$i"
 EOF
 
 chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
@@ -551,7 +552,7 @@ chmod +x $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
 scp -i $SSH_KEY $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 
 IN_FILE="$i"_SIFT_MOVE_JOB.sh
-ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 mv $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh $JOBS_DONE/"$i"_SIFT_MOVE_JOB.sh
 
 done
@@ -662,7 +663,7 @@ for (( c=1; c<=$NUMBER_OF_SERVERS; c++ ))
         	sed -n "$STARTLINE","$ENDLINE"p $MATCH_LIST_DIR/.matchtmp.txt  > $WORKING_DIR/matchlist_$c.txt 
 	fi
 CURRENT_SERVER=`sed -n "$c"p $SERVER_LIST_DIR/serverlist.txt`
-scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SFM_USERNAME@$CURRENT_SERVER:$HOST_WORKDIR
+scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SLAVE_USERNAME@$CURRENT_SERVER:$HOST_WORKDIR
 
 done                     
 }
@@ -696,7 +697,7 @@ for (( i=1 ; i <= $j ; i++ )) ; do
 
 	VisualSFM sfm+pairs+skipsfm . nomatch.nvm matchlist_$i.txt
 	VisualSFM sfm+skipsfm+exportp . matches_out_$i.txt
-	scp -i $SSH_KEY_C matches_out_$i.txt $SFM_USERNAME@$MASTER_SERVER:$WORKING_DIR/
+	scp -i $SSH_KEY_C matches_out_$i.txt $MASTER_USERNAME@$MASTER_SERVER:$WORKING_DIR/
 	#cp matches_out_$i.txt $WORKING_DIR/
 EOF
 
@@ -704,7 +705,7 @@ EOF
 	#mv $HOME/RENDER_SERVER/JOBS_SETUP/"$i"_MATCH_JOB.sh $HOME/RENDER_SERVER/JOBS_PENDING/
 	scp -i $SSH_KEY $JOBS_SET/"$i"_MATCH_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 	IN_FILE="$i"_MATCH_JOB.sh
-	ssh -i $SSH_KEY $SFM_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+	ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
 done
 }
@@ -899,23 +900,23 @@ scpTo () {
 	SCP_FILE=$1
 	DEST_IP=$2
 	SCP_REMOTE_DIR=$3
-	scp -i $SSH_KEY -r $SCP_FILE $SFM_USERNAME@$DEST_IP:$SCP_DIR
+	scp -i $SSH_KEY -r $SCP_FILE $SLAVE_USERNAME@$DEST_IP:$SCP_DIR
 }
 
 scpToCueIp () {
 	echo "in function scpToCueIp"
 	IN_FILE=$1
 	DEST_IP=$2
-	ssh -i $SSH_KEY $SFM_USERNAME@$DEST_IP "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+	ssh -i $SSH_KEY $SLAVE_USERNAME@$DEST_IP "RFILE=$IN_FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
-	# ssh -i ~/dsw/aws/dloud.pem $SFM_USERNAME@107.23.25.221 "RFILE=$FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+	# ssh -i ~/dsw/aws/dloud.pem $SLAVE_USERNAME@107.23.25.221 "RFILE=$FILE ; mv ~/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 }	
 
 scpHome () {
 	echo "in function scpHome!"
 	IN_FILE=$1
 	DEST_IP=$HOME_IP
-	scp -i $SSH_KEY -r $SCP_FILE $SFM_USERNAME@$DEST_IP:$WORKING_DIR
+	scp -i $SSH_KEY -r $SCP_FILE $SLAVE_USERNAME@$DEST_IP:$WORKING_DIR
 	:
 }
 
