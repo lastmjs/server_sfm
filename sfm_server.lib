@@ -10,7 +10,7 @@ echo "Booting SFM"
 
 initVars () {
 TESTLOCAL=1 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
-SFM_USERNAME="lastmj"
+SFM_USERNAME="byuarchaeology"
 MASTER_SERVER="10.0.1.56"
 #SERVER_POSTFIX=".nz.local"
 SERVER_POSTFIX="" # I don't need a postfix for right now
@@ -122,9 +122,10 @@ rm -fr $SERVER_LIST_DIR/serverlist.txt
 echo "Sever List Dir is: $SERVER_LIST_DIR"
 
 #replacing ec2 server list with manual server list
-echo "nz7-10432.local" > $SERVER_LIST_DIR/serverlist.txt
-echo "nz7-10500.local" >>$SERVER_LIST_DIR/serverlist.txt
-echo "nz7-10516.local" >>$SERVER_LIST_DIR/serverlist.txt
+echo "10.0.1.102" > $SERVER_LIST_DIR/serverlist.txt
+#echo "nz7-10432.local" > $SERVER_LIST_DIR/serverlist.txt
+#echo "nz7-10500.local" >>$SERVER_LIST_DIR/serverlist.txt
+#echo "nz7-10516.local" >>$SERVER_LIST_DIR/serverlist.txt
 CPU_ARRAY=(16 24 24)
 NUMBER_OF_SERVERS=3  # should be wc -l $SERVER_LIST_DIR/serverlist.txt | awk {'print $1'}
 
