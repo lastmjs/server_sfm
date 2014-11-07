@@ -9,7 +9,7 @@ echo " "
 echo "Booting SFM"
 
 initVars () {
-TESTLOCAL=1 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
+TESTLOCAL=0 # 1 means you haven't finished this project yet!! enjoy deleting this line comment =]
 MASTER_USERNAME="lastmj"
 SLAVE_USERNAME="byuarchaeology"
 MASTER_SERVER="10.0.1.56"
@@ -21,10 +21,8 @@ WORKING_DIR=$PWD
 SERVER_IP="NULL"
 START_SERVER_IP_RANGE=20
 SERVER_LIST_DIR=~/sfm/servers/
-#SSH_KEY=~/.ssh/sfm.pem
-#SSH_KEY_C=~/.ssh/sfm.pem
-SSH_KEY=~/.ssh/known_hosts
-SSH_KEY_C=~/.ssh/known_hosts
+SSH_KEY=~/.ssh/sfm.pem
+SSH_KEY_C=~/.ssh/sfm.pem
 MATCH_LIST_DIR=$IMG_LOG_DIR/matches/
 SERVER_DIR=~/
 #VSFM_AMI_ID=ami-1b785972
@@ -224,17 +222,17 @@ for i in `cat $SERVER_LIST_DIR/serverlist.txt` ;do
 # this line removes the ip from knownhosts to prevent a Spoof Login
     ssh-keygen -F "~/.ssh/known_hosts" -R $i
 #	ping -c 1 $i
-#	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $MASTER_USERNAME@$i:~/sfm/server_sfm/
-#	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $MASTER_USERNAME@$i:~/sfm/server_sfm/
-#	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $MASTER_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~/sfm/server_sfm/launch_sh_server.sh $SLAVE_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~/sfm/server_sfm/sh_server.sh $SLAVE_USERNAME@$i:~/sfm/server_sfm/
+#	scp -i $SSH_KEY ~//sfm/server_sfm/server_sfm-sfm.lib $SLAVE_USERNAME@$i:~/sfm/server_sfm/
 # copy yrself yo!
 
-#	ssh -i $SSH_KEY $MASTER_USERNAME@$i "killall screen"
-	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p ~/JOBS/SET"
-#	ssh -X -i $SSH_KEY $MASTER_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
-	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p ~/JOBS/SET"
-	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p ~/JOBS/DONE"
-	ssh -i $SSH_KEY $MASTER_USERNAME@$i "mkdir -p $HOST_WORKDIR"
+#	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "killall screen"
+	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p ~/JOBS/SET"
+#	ssh -X -i $SSH_KEY $SLAVE_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
+	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p ~/JOBS/SET"
+	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p ~/JOBS/DONE"
+	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p $HOST_WORKDIR"
 
 
 done
