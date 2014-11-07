@@ -31,7 +31,7 @@ SERVER_DIR=~/sfm
 #echo $UNINITIATED
 JOBS_SET=~/sfm/JOBS/SET
 JOBS_DONE=~/sfm/JOBS/DONE
-HOST_WORKDIR=~/Pictures/sfmWorkDir
+#HOST_WORKDIR=~/Pictures/sfmWorkDir
 }
 
 
@@ -232,7 +232,7 @@ for i in `cat $SERVER_LIST_DIR/serverlist.txt` ;do
 #	ssh -X -i $SSH_KEY $SLAVE_USERNAME@$i "~/dsw/aws/launch_sh_server.sh"
 	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p ~/JOBS/SET"
 	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p ~/JOBS/DONE"
-	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p $HOST_WORKDIR"
+	ssh -i $SSH_KEY $SLAVE_USERNAME@$i "mkdir -p ~/Pictures/sfmWorkDir"
 
 
 done
@@ -283,8 +283,8 @@ for i in `cat $SERVER_LIST_DIR/serverlist.txt`
 do 
     #for j in `cat $IMG_LOG_DIR/img_list.txt` ;do	
     ssh-keygen -F "~/.ssh/known_hosts" -R $i 1>&2
-		scp -i $SSH_KEY imageArchive.tar $i:$HOST_WORKDIR &
-		#scp -i $SSH_KEY $j $i:$HOST_WORKDIR
+		scp -i $SSH_KEY imageArchive.tar $SLAVE_USERNAME@$i:~/Pictures/sfmWorkDir &
+		#scp -i $SSH_KEY $j $i:~/Pictures/sfmWorkDir
 	#done
 done
 wait
@@ -296,9 +296,9 @@ do
 			CURRENT_SERVER=`sed -n "$count"p $SERVER_LIST_DIR/serverlist.txt` 
 			echo server $CURRENT_SERVER number $i
 
-			#scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$HOST_WORKDIR
+			#scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:~/Pictures/sfmWorkDir
 
-			ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "cd $HOST_WORKDIR ; tar xf $HOST_WORKDIR/imageArchive.tar &"
+			ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "cd ~/Pictures/sfmWorkDir ; tar xf ~/Pictures/sfmWorkDir/imageArchive.tar &"
 			((count++))
 done
 }
@@ -390,7 +390,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1}'`
 			CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt` 
 			echo server $CURRENT_SERVER number $i
 
-			scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $CURRENT_SERVER:$HOST_WORKDIR
+			scp -i $SSH_KEY $WORKING_DIR/siftlists/"$i"_siftlist.txt $SLAVE_USERNAME@$CURRENT_SERVER:~/Pictures/sfmWorkDir
 		done
 echo "leaving cLTRS"
 }
@@ -434,7 +434,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		##### WHERE YO AT YO
 		#echo cd "$HOME"/.aws/servers/fake_servers/"$CURRENT_SERVER"/ 	 > $JOBS_SET/"$i"_JOB.sh
 		#echo "echo your pwd is: \$PWD" 									>> $JOBS_SET/"$i"_JOB.sh
-		echo cd $HOST_WORKDIR > $JOBS_SET/"$i"_sift_JOB.sh
+		echo cd ~/Pictures/sfmWorkDir > $JOBS_SET/"$i"_sift_JOB.sh
 		echo VisualSFM siftgpu "$i"_siftlist.txt >> $JOBS_SET/"$i"_sift_JOB.sh
 #		echo scpHome *.sift $WORKING_DIR 	 >> $JOBS_SET/"$i"_sift_JOB.sh
 		echo scp -i $SSH_KEY_C -r *.sift $MASTER_USERNAME@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
@@ -442,7 +442,7 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 	
 		chmod +x $JOBS_SET/"$i"_sift_JOB.sh
 		
-		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
+		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $SLAVE_USERNAME@$CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
 
 		IN_FILE="$i"_sift_JOB.sh 
 		ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
@@ -520,7 +520,7 @@ for (( i=1 ; i <= $j ; i++)) ; do
 CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
 #sould become function (getLoopCurrentServerID#
 	cat <<EOF > $JOBS_SET/"$i"_SIFT_MOVE_JOB.sh
-cd $HOST_WORKDIR
+cd ~/Pictures/sfmWorkDir
 echo MY PWD IS... $PWD
 #rm getRemainingSifts.txt   
 MAIN=".sift"
@@ -661,7 +661,7 @@ for (( c=1; c<=$NUMBER_OF_SERVERS; c++ ))
         	sed -n "$STARTLINE","$ENDLINE"p $MATCH_LIST_DIR/.matchtmp.txt  > $WORKING_DIR/matchlist_$c.txt 
 	fi
 CURRENT_SERVER=`sed -n "$c"p $SERVER_LIST_DIR/serverlist.txt`
-scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SLAVE_USERNAME@$CURRENT_SERVER:$HOST_WORKDIR
+scp -i $SSH_KEY $WORKING_DIR/matchlist_$c.txt $SLAVE_USERNAME@$CURRENT_SERVER:~/Pictures/sfmWorkDir
 
 done                     
 }
@@ -691,7 +691,7 @@ for (( i=1 ; i <= $j ; i++ )) ; do
 	CURRENT_SERVER=`sed -n "$i"p $SERVER_LIST_DIR/serverlist.txt`
 
 	cat <<EOF > $JOBS_SET/"$i"_MATCH_JOB.sh
-	cd $HOST_WORKDIR
+	cd ~/Pictures/sfmWorkDir
 
 	VisualSFM sfm+pairs+skipsfm . nomatch.nvm matchlist_$i.txt
 	VisualSFM sfm+skipsfm+exportp . matches_out_$i.txt
@@ -773,7 +773,7 @@ function copyMatchesToRealServers () {
 
 for i in `cat $SERVER_LIST_DIR/serverlist.txt`
 do 
-scp -i $SSH_KEY *.mat $i:$HOST_WORKDIR
+scp -i $SSH_KEY *.mat $i:~/Pictures/sfmWorkDir
 #     for j in `ls -1 $WORKING_DIR/*.mat`
 #	do
 #	scp -i dloud.pem $j $i:/media/ephemeral
