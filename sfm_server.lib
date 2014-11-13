@@ -432,9 +432,9 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		echo "Creating SiftSH for $CURRENT_SERVER"
 		
 		##### WHERE YO AT YO
-		#echo cd "$HOME"/.aws/servers/fake_servers/"$CURRENT_SERVER"/ 	 > $JOBS_SET/"$i"_JOB.sh
-		#echo "echo your pwd is: \$PWD" 									>> $JOBS_SET/"$i"_JOB.sh
-		echo cd ~/Pictures/sfmWorkDir > $JOBS_SET/"$i"_sift_JOB.sh
+#		echo cd "$HOME"/.aws/servers/fake_servers/"$CURRENT_SERVER"/ 	 > $JOBS_SET/"$i"_JOB.sh
+#		echo "echo your pwd is: \$PWD" 									>> $JOBS_SET/"$i"_JOB.sh
+		echo cd /home/$SLAVE_USERNAME/Pictures/sfmWorkDir > $JOBS_SET/"$i"_sift_JOB.sh
 		echo VisualSFM siftgpu "$i"_siftlist.txt >> $JOBS_SET/"$i"_sift_JOB.sh
 #		echo scpHome *.sift $WORKING_DIR 	 >> $JOBS_SET/"$i"_sift_JOB.sh
 		echo scp -i $SSH_KEY_C -r *.sift $MASTER_USERNAME@$MASTER_SERVER:$WORKING_DIR >> $JOBS_SET/"$i"_sift_JOB.sh
@@ -442,10 +442,10 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 	
 		chmod +x $JOBS_SET/"$i"_sift_JOB.sh
 		
-		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $SLAVE_USERNAME@$CURRENT_SERVER:$SERVER_DIR/RENDER_SERVER/JOBS_SETUP/
+		scp -i $SSH_KEY $JOBS_SET/"$i"_sift_JOB.sh $SLAVE_USERNAME@$CURRENT_SERVER:~/sfm/RENDER_SERVER/JOBS_SETUP/
 
 		IN_FILE="$i"_sift_JOB.sh 
-		ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv $SERVER_DIR/RENDER_SERVER/JOBS_SETUP/\$RFILE $SERVER_DIR/RENDER_SERVER/JOBS_PENDING/\$RFILE"
+		ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/sfm/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/sfm/RENDER_SERVER/JOBS_PENDING/\$RFILE"
 
 #		scpToCueIp "$i"_JOB.sh $CURRENT_SERVER
 		
