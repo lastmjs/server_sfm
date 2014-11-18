@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]
-then
-    x-terminal-emulator --noclose
-else
-    open -a /Applications/Utilities/Terminal.app/
-fi
+#if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]
+#then
+#    x-terminal-emulator --noclose
+#else
+#    open -a /Applications/Utilities/Terminal.app/
+#fi
 
 ~/sfm/server_sfm/termScreenGL.sh
 sleep 5; 

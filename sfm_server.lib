@@ -447,8 +447,9 @@ j=`wc -l $SERVER_LIST_DIR/serverlist.txt | awk '{ print $1 }'`
 		IN_FILE="$i"_sift_JOB.sh 
 		#ssh -i $SSH_KEY $SLAVE_USERNAME@$CURRENT_SERVER "RFILE=$IN_FILE ; mv ~/sfm/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/sfm/RENDER_SERVER/JOBS_PENDING/\$RFILE"
         #ssh $SLAVE_USERNAME@$CURRENT_SERVER screen -DR spawner_GL "RFILE=$IN_FILE ; mv ~/sfm/RENDER_SERVER/JOBS_SETUP/\$RFILE ~/sfm/RENDER_SERVER/JOBS_PENDING/\$RFILE"
-        ssh $SLAVE_USERNAME@$CURRENT_SERVER screen -DR spawner_GL "mv ~/sfm/RENDER_SERVER/JOBS_SETUP/'$i'_sift_JOB.sh  ~/sfm/RENDER_SERVER/JOBS_PENDING/'$i'_sift_JOB.sh"
-
+        ssh $SLAVE_USERNAME@$CURRENT_SERVER screen -DR spawner_GL "RFILE=$IN_FILE ; mv ~/sfm/RENDER_SERVER/JOBS_SETUP/1_sift_JOB.sh ~/sfm/RENDER_SERVER/JOBS_PENDING/1_sift_JOB.sh"
+        #ssh $SLAVE_USERNAME@$CURRENT_SERVER screen -DR spawner_GL "mv /home/byuarchaeology/sfm/RENDER_SERVER/JOBS_SETUP/'$i'_sift_JOB.sh  /home/byuarchaeology/sfm/RENDER_SERVER/JOBS_PENDING/'$i'_sift_JOB.sh"
+        
 #		scpToCueIp "$i"_JOB.sh $CURRENT_SERVER
 		
 		mv $JOBS_SET/"$i"_sift_JOB.sh $JOBS_DONE/
